@@ -22,6 +22,7 @@
 	"blog.empty": "No posts found.",
 	"blog.readMore": "Read post",
 	"blog.readingTime": "{minutes} min read",
+	"blog.coverLabel": "Cover for {title}",
 	"search.placeholder": "Search posts...",
 	"search.results": "{count} results for \"{query}\"",
 	"search.noResults": "No matches. Try a different query.",
@@ -50,5 +51,9 @@
 	"common.retry": "Try again",
 	"common.save": "Save",
 	"common.cancel": "Cancel",
+	"pagination.previous": "Previous page",
+	"pagination.next": "Next page",
+	"pagination.page": "Page {page}",
+	"pagination.range": "Showing {start} - {end}",
 	"footer.copy": "© 2026 Demo Co."
 }

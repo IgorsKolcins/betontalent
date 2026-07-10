@@ -22,6 +22,7 @@
 	"blog.empty": "Keine Beiträge gefunden.",
 	"blog.readMore": "Beitrag lesen",
 	"blog.readingTime": "{minutes} Min. Lesezeit",
+	"blog.coverLabel": "Cover für {title}",
 	"search.placeholder": "Beiträge durchsuchen...",
 	"search.results": "{count} Treffer für \"{query}\"",
 	"search.noResults": "Keine Treffer. Versuche eine andere Suche.",
@@ -50,5 +51,9 @@
 	"common.retry": "Erneut versuchen",
 	"common.save": "Speichern",
 	"common.cancel": "Abbrechen",
+	"pagination.previous": "Vorherige Seite",
+	"pagination.next": "Nächste Seite",
+	"pagination.page": "Seite {page}",
+	"pagination.range": "Zeige {start} - {end}",
 	"footer.copy": "© 2026 Demo Co."
 }

@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { apiFetch, type ApiFetch, type ApiResult } from '$lib/api/client';
 import { postsResponseSchema, type PostsResponse } from './schema';
 
@@ -14,7 +15,7 @@ export async function getPosts(fetcher: ApiFetch): Promise<ApiResult<PostsRespon
 
 	if (!parsed.success) {
 		console.error('Blog posts API contract mismatch', {
-			error: parsed.error.flatten()
+			error: z.flattenError(parsed.error)
 		});
 
 		return {

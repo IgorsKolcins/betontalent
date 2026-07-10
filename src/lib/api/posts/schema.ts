@@ -18,7 +18,7 @@ export const postSchema = z.object({
 		name: z.string().min(1),
 		avatarColor: z.string().regex(/^#[0-9a-f]{6}$/i)
 	}),
-	publishedAt: z.string().datetime(),
+	publishedAt: z.iso.datetime(),
 	readingTimeMinutes: z.number().int().positive(),
 	coverColor: z.string().regex(/^#[0-9a-f]{6}$/i)
 });
