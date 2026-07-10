@@ -17,6 +17,21 @@
 			{$_('brand.name')}
 		</a>
 
+		<nav class="hidden items-center gap-1 md:flex" aria-label={$_('nav.primary')}>
+			<a
+				href={resolve('/blog')}
+				class="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:bg-accent hover:text-accent-foreground"
+			>
+				{$_('nav.blog')}
+			</a>
+			<a
+				href={resolve('/search')}
+				class="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:bg-accent hover:text-accent-foreground"
+			>
+				{$_('nav.search')}
+			</a>
+		</nav>
+
 		<div class="flex items-center gap-2">
 			<Button
 				variant="secondary"

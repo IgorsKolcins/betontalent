@@ -12,8 +12,6 @@ export const load: PageServerLoad = async ({ fetch, parent, url }) => {
 		formData,
 		postsResult: await getPosts(fetch, {
 			...formData.data,
-			q: '',
-			tag: '',
 			locale
 		})
 	};

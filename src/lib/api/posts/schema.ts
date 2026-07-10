@@ -1,6 +1,7 @@
 import { z } from 'zod';
+import { POSTS_PER_PAGE } from './query';
 
-const localeSchema = z.enum(['en', 'de']);
+export const localeSchema = z.enum(['en', 'de']);
 
 export const postTranslationSchema = z.object({
 	title: z.string().min(1),
@@ -24,8 +25,18 @@ export const postSchema = z.object({
 });
 
 export const postsResponseSchema = z.object({
-	posts: z.array(postSchema)
+	posts: z.array(postSchema),
+	tags: z.array(z.string().min(1)),
+	pagination: z.object({
+		page: z.number().int().positive(),
+		perPage: z.number().int().positive().default(POSTS_PER_PAGE),
+		total: z.number().int().nonnegative(),
+		totalPages: z.number().int().positive(),
+		start: z.number().int().nonnegative(),
+		end: z.number().int().nonnegative()
+	})
 });
 
 export type Post = z.infer<typeof postSchema>;
 export type PostsResponse = z.infer<typeof postsResponseSchema>;
+export type Locale = z.infer<typeof localeSchema>;

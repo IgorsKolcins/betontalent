@@ -42,7 +42,16 @@ describe('blog posts API helper', () => {
 						readingTimeMinutes: 3,
 						coverColor: '#0ea5e9'
 					}
-				]
+				],
+				tags: ['engineering'],
+				pagination: {
+					page: 1,
+					perPage: 6,
+					total: 1,
+					totalPages: 1,
+					start: 1,
+					end: 1
+				}
 			})
 		);
 
@@ -57,7 +66,16 @@ describe('blog posts API helper', () => {
 						id: 'post_1',
 						slug: 'edge-api'
 					})
-				]
+				],
+				tags: ['engineering'],
+				pagination: {
+					page: 1,
+					perPage: 6,
+					total: 1,
+					totalPages: 1,
+					start: 1,
+					end: 1
+				}
 			}
 		});
 	});

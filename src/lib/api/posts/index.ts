@@ -1,9 +1,15 @@
 import { z } from 'zod';
 import { apiFetch, type ApiFetch, type ApiResult } from '$lib/api/client';
+import { createApiPostQueryParams, type PostQuery } from './query';
 import { postsResponseSchema, type PostsResponse } from './schema';
 
-export async function getPosts(fetcher: ApiFetch): Promise<ApiResult<PostsResponse>> {
-	const result = await apiFetch<unknown>(fetcher, '/api/posts', {
+export async function getPosts(
+	fetcher: ApiFetch,
+	query: Partial<PostQuery> = {}
+): Promise<ApiResult<PostsResponse>> {
+	const params = createApiPostQueryParams(query);
+	const path = params ? `/api/posts?${params}` : '/api/posts';
+	const result = await apiFetch<unknown>(fetcher, path, {
 		errorUserMessage: 'Could not load blog posts'
 	});
 
