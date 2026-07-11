@@ -49,7 +49,7 @@
 
 	{#if searchProps}
 		<div
-			class="grid gap-x-4 md:grid-cols-[minmax(0,1fr)_minmax(10rem,14rem)_auto] bg-muted border border-border rounded-md p-4 mb-10"
+			class="grid gap-x-4 md:grid-cols-[minmax(0,1fr)_minmax(10rem,14rem)_auto] bg-card border border-border rounded-md p-4 mb-10"
 		>
 			<FormField
 				label={m['search.queryLabel']()}
