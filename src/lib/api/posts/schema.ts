@@ -9,7 +9,7 @@ export const postTranslationSchema = z.object({
 	body: z.string().min(1)
 });
 
-export const postSchema = z.object({
+export const rawPostSchema = z.object({
 	id: z.string().min(1),
 	slug: z.string().min(1),
 	translations: z.record(localeSchema, postTranslationSchema),
@@ -24,8 +24,14 @@ export const postSchema = z.object({
 	coverColor: z.string().regex(/^#[0-9a-f]{6}$/i)
 });
 
+export const localizedPostSchema = rawPostSchema.omit({ translations: true }).extend({
+	title: z.string().min(1),
+	excerpt: z.string().min(1),
+	body: z.string().min(1)
+});
+
 export const postsResponseSchema = z.object({
-	posts: z.array(postSchema),
+	posts: z.array(localizedPostSchema),
 	tags: z.array(z.string().min(1)),
 	pagination: z.object({
 		page: z.number().int().positive(),
@@ -37,6 +43,7 @@ export const postsResponseSchema = z.object({
 	})
 });
 
-export type Post = z.infer<typeof postSchema>;
+export type RawPost = z.infer<typeof rawPostSchema>;
+export type LocalizedPost = z.infer<typeof localizedPostSchema>;
 export type PostsResponse = z.infer<typeof postsResponseSchema>;
 export type Locale = z.infer<typeof localeSchema>;

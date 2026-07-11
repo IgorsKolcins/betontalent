@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
+	import { m } from '$lib/paraglide/messages.js';
 	import PaginationNav from '$lib/components/blog/PaginationNav.svelte';
 	import PostCard from '$lib/components/blog/PostCard.svelte';
 	import PostControls from '$lib/components/blog/PostControls.svelte';
@@ -7,28 +7,32 @@
 	let { data } = $props();
 	const postsPage = $derived(data.postsResult.ok ? data.postsResult.data : undefined);
 	const posts = $derived(postsPage?.posts ?? []);
-	const searchPath = '/search';
 	const hasQuery = $derived(Boolean(data.formData.data.q));
 </script>
 
 <svelte:head>
-	<title>{$_('search.title')} | {$_('app.title')}</title>
-	<meta name="description" content={$_('search.description')} />
+	<title>{m['search.title']()} | {m['app.title']()}</title>
+	<meta name="description" content={m['search.description']()} />
+	<link rel="canonical" href={data.seo.canonical} />
+	{#each data.seo.alternates as alternate (alternate.hreflang)}
+		<link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />
+	{/each}
+	<link rel="alternate" hreflang="x-default" href={data.seo.xDefault} />
 </svelte:head>
 
 <main class="min-h-screen py-10 md:py-14">
 	<section class="container space-y-8" aria-labelledby="search-title">
 		<div class="max-w-2xl space-y-3">
 			<h1 id="search-title" class="text-4xl leading-tight font-bold text-foreground md:text-5xl">
-				{$_('search.title')}
+				{m['search.title']()}
 			</h1>
 			<p class="text-base leading-7 text-muted-foreground">
-				{$_('search.description')}
+				{m['search.description']()}
 			</p>
 		</div>
 
 		<PostControls
-			action={searchPath}
+			action="search"
 			formData={data.formData}
 			showSearch
 			tags={postsPage?.tags ?? []}
@@ -38,11 +42,12 @@
 			{#if postsPage}
 				<p class="text-sm font-medium text-muted-foreground">
 					{#if hasQuery}
-						{$_('search.results', {
-							values: { count: postsPage.pagination.total, query: data.formData.data.q }
+						{m['search.results']({
+							count: postsPage.pagination.total,
+							query: data.formData.data.q
 						})}
 					{:else}
-						{$_('search.resultsCount', { values: { count: postsPage.pagination.total } })}
+						{m['search.resultsCount']({ count: postsPage.pagination.total })}
 					{/if}
 				</p>
 			{/if}
@@ -55,7 +60,7 @@
 				</div>
 				{#if postsPage}
 					<PaginationNav
-						action={searchPath}
+						action="search"
 						query={data.formData.data}
 						pagination={postsPage.pagination}
 						includeSearch
@@ -63,12 +68,12 @@
 				{/if}
 			{:else}
 				<p class="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
-					{$_('search.noResults')}
+					{m['search.noResults']()}
 				</p>
 			{/if}
 		{:else}
 			<p class="rounded-lg border border-border bg-card p-6 text-sm text-destructive">
-				{$_('common.error')}
+				{m['common.error']()}
 			</p>
 		{/if}
 	</section>

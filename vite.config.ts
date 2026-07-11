@@ -3,9 +3,36 @@ import { playwright } from '@vitest/browser-playwright';
 import tailwindcss from '@tailwindcss/vite';
 import adapter from '@sveltejs/adapter-vercel';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { paraglideVitePlugin } from '@inlang/paraglide-js';
 
 export default defineConfig({
 	plugins: [
+		paraglideVitePlugin({
+			project: './project.inlang',
+			outdir: './src/lib/paraglide',
+			strategy: ['url', 'cookie', 'baseLocale'],
+			urlPatterns: [
+				{
+					pattern: '/',
+					localized: [
+						['en', '/en'],
+						['de', '/de']
+					]
+				},
+				{
+					pattern: '/:path(.*)?',
+					localized: [
+						['en', '/en/:path(.*)?'],
+						['de', '/de/:path(.*)?']
+					]
+				}
+			],
+			routeStrategies: [
+				{ match: '/api/:path(.*)?', exclude: true },
+				{ match: '/sitemap.xml', exclude: true },
+				{ match: '/demo/:path(.*)?', exclude: true }
+			]
+		}),
 		tailwindcss(),
 		sveltekit({
 			compilerOptions: {

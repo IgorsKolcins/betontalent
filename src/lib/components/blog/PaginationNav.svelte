@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { localizeHref } from '$lib/paraglide/runtime.js';
 	import {
 		createPostQueryParams,
 		type PostQueryForm,
@@ -9,8 +10,7 @@
 	import type { PostsResponse } from '$lib/api/posts/schema';
 	import Pagination from '$lib/components/ui/Pagination.svelte';
 
-	type ActionPath = '/blog' | '/search';
-	type QueryHref = ActionPath | `${ActionPath}?${string}`;
+	type PostRoute = 'blog' | 'search';
 
 	let {
 		action,
@@ -18,13 +18,13 @@
 		pagination,
 		includeSearch = false
 	}: {
-		action: ActionPath;
+		action: PostRoute;
 		query: PostQueryForm;
 		pagination: PostsResponse['pagination'];
 		includeSearch?: boolean;
 	} = $props();
 
-	function hrefFor(page: number): QueryHref {
+	function queryStringFor(page: number): string {
 		const params = createPostQueryParams({
 			q: includeSearch ? query.q : '',
 			tag: includeSearch ? query.tag : '',
@@ -32,11 +32,13 @@
 			page
 		});
 
-		return params ? `${action}?${params}` : action;
+		return params ? `?${params}` : '';
 	}
 
 	function navigateToPage(page: number) {
-		void goto(resolve(hrefFor(page)), {
+		const queryString = queryStringFor(page);
+
+		void goto(resolve(localizeHref(`/${action}${queryString}`) as '/'), {
 			keepFocus: true,
 			noScroll: false
 		});

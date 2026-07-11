@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { locale, _ } from 'svelte-i18n';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale } from '$lib/paraglide/runtime.js';
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import {
 		Card,
@@ -9,11 +10,10 @@
 		CardHeader,
 		CardTitle
 	} from '$lib/components/ui/Card';
-	import type { Locale, Post } from '$lib/api/posts/schema';
+	import type { LocalizedPost } from '$lib/api/posts/schema';
 
-	let { post }: { post: Post } = $props();
-	const activeLocale = $derived(($locale ?? 'en') as Locale);
-	const translation = $derived(post.translations[activeLocale]);
+	let { post }: { post: LocalizedPost } = $props();
+	const activeLocale = $derived(getLocale());
 	const dateFormatter = $derived(
 		new Intl.DateTimeFormat(activeLocale, {
 			day: 'numeric',
@@ -21,6 +21,8 @@
 			year: 'numeric'
 		})
 	);
+	const numberFormatter = $derived(new Intl.NumberFormat(activeLocale));
+	const readingTimeMinutes = $derived(numberFormatter.format(post.readingTimeMinutes));
 </script>
 
 <Card class="pt-0">
@@ -28,7 +30,7 @@
 		data-slot="post-cover"
 		class="h-36 border-b border-border"
 		style:background-color={post.coverColor}
-		aria-label={$_('blog.coverLabel', { values: { title: translation.title } })}
+		aria-label={m['blog.coverLabel']({ title: post.title })}
 		role="img"
 	></div>
 	<CardHeader>
@@ -37,8 +39,8 @@
 				<Badge variant="outline">{tag}</Badge>
 			{/each}
 		</div>
-		<CardTitle class="mb-2">{translation.title}</CardTitle>
-		<CardDescription>{translation.excerpt}</CardDescription>
+		<CardTitle class="mb-2">{post.title}</CardTitle>
+		<CardDescription>{post.excerpt}</CardDescription>
 	</CardHeader>
 	<CardContent class="mt-auto">
 		<div class="flex items-center gap-2">
@@ -57,7 +59,7 @@
 			{dateFormatter.format(new Date(post.publishedAt))}
 		</time>
 		<span>
-			{$_('blog.readingTime', { values: { minutes: post.readingTimeMinutes } })}
+			{m['blog.readingTime']({ minutes: readingTimeMinutes })}
 		</span>
 	</CardFooter>
 </Card>

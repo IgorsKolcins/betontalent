@@ -6,26 +6,13 @@ import {
 	type PostSortOption
 } from '$lib/api/posts/query';
 import {
-	postsResponseSchema,
+	rawPostSchema,
 	type Locale,
-	type Post,
+	type RawPost,
 	type PostsResponse
 } from '$lib/api/posts/schema';
 
-const parsedPosts = postsResponseSchema.parse({
-	posts: postsJson,
-	tags: [],
-	pagination: {
-		page: 1,
-		perPage: POSTS_PER_PAGE,
-		total: postsJson.length,
-		totalPages: Math.max(1, Math.ceil(postsJson.length / POSTS_PER_PAGE)),
-		start: postsJson.length > 0 ? 1 : 0,
-		end: Math.min(postsJson.length, POSTS_PER_PAGE)
-	}
-});
-
-const posts = parsedPosts.posts;
+const posts = rawPostSchema.array().parse(postsJson);
 
 export function listPostTags(): string[] {
 	return [...new Set(posts.flatMap((post) => post.tags))].sort((first, second) =>
@@ -53,7 +40,10 @@ export function listPosts(query: Partial<PostQuery> = {}): PostsResponse {
 	const pagePosts = filteredPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
 
 	return {
-		posts: pagePosts,
+		posts: pagePosts.map((post) => {
+			const { translations, ...shared } = post;
+			return { ...shared, ...translations[locale] };
+		}),
 		tags: listPostTags(),
 		pagination: {
 			page: safePage,
@@ -66,7 +56,7 @@ export function listPosts(query: Partial<PostQuery> = {}): PostsResponse {
 	};
 }
 
-function matchesSearch(post: Post, q: string, locale: Locale): boolean {
+function matchesSearch(post: RawPost, q: string, locale: Locale): boolean {
 	if (!q) return true;
 
 	const translation = post.translations[locale];
@@ -76,7 +66,12 @@ function matchesSearch(post: Post, q: string, locale: Locale): boolean {
 	return searchableText.includes(q);
 }
 
-function comparePosts(first: Post, second: Post, sort: PostSortOption, locale: Locale): number {
+function comparePosts(
+	first: RawPost,
+	second: RawPost,
+	sort: PostSortOption,
+	locale: Locale
+): number {
 	// Sort options are encoded as field-direction tokens so URL state maps directly to one comparator.
 	const [field, direction] = sort.split('-') as [
 		'title' | 'publishedAt' | 'readingTimeMinutes',

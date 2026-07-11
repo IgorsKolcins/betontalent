@@ -20,18 +20,9 @@ describe('blog posts API helper', () => {
 					{
 						id: 'post_1',
 						slug: 'edge-api',
-						translations: {
-							en: {
-								title: 'Edge API',
-								excerpt: 'Fast content delivery.',
-								body: 'Fast content delivery.'
-							},
-							de: {
-								title: 'Edge-API',
-								excerpt: 'Schnelle Content-Auslieferung.',
-								body: 'Schnelle Content-Auslieferung.'
-							}
-						},
+						title: 'Edge API',
+						excerpt: 'Fast content delivery.',
+						body: 'Fast content delivery.',
 						tags: ['engineering'],
 						author: {
 							id: 'u_1',

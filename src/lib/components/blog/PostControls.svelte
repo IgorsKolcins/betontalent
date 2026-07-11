@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
 	import { Search } from '@lucide/svelte';
+	import { resolve } from '$app/paths';
 	import { untrack } from 'svelte';
-	import { _ } from 'svelte-i18n';
 	import { superForm, type SuperValidated } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import Button from '$lib/components/ui/Button.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { localizeHref } from '$lib/paraglide/runtime.js';
 	import FormField from '$lib/components/ui/FormField.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
 	import {
@@ -14,7 +15,7 @@
 		type PostQueryForm
 	} from '$lib/api/posts/query';
 
-	type ActionPath = '/blog' | '/search';
+	type PostRoute = 'blog' | 'search';
 
 	let {
 		action,
@@ -22,7 +23,7 @@
 		showSearch = false,
 		tags = []
 	}: {
-		action: ActionPath;
+		action: PostRoute;
 		formData: SuperValidated<PostQueryForm>;
 		showSearch?: boolean;
 		tags?: string[];
@@ -40,20 +41,18 @@
 
 <form
 	method="GET"
-	{action}
+	action={resolve(localizeHref(`/${action}`) as '/')}
 	class="grid gap-4 rounded-lg border border-border bg-card p-4 shadow-sm md:grid-cols-[minmax(0,1fr)_minmax(10rem,14rem)_auto]"
 >
 	{#if showSearch}
 		<FormField
-			label={$_('search.queryLabel')}
-			error={$errors.q?.[0]
-				? $_('search.queryMaxError', { values: { max: MAX_POST_QUERY_LENGTH } })
-				: undefined}
+			label={m['search.queryLabel']()}
+			error={$errors.q?.[0] ? m['search.queryMaxError']({ max: MAX_POST_QUERY_LENGTH }) : undefined}
 		>
 			<Input
 				name="q"
 				type="search"
-				placeholder={$_('search.placeholder')}
+				placeholder={m['search.placeholder']()}
 				bind:value={$form.q}
 				aria-invalid={$errors.q ? 'true' : undefined}
 			>
@@ -65,13 +64,13 @@
 			</Input>
 		</FormField>
 
-		<FormField label={$_('search.tagLabel')}>
+		<FormField label={m['search.tagLabel']()}>
 			<select
 				name="tag"
 				bind:value={$form.tag}
 				class="min-h-10 rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm transition-colors duration-150 hover:border-ring focus:border-ring focus:outline-2 focus:outline-offset-2 focus:outline-ring"
 			>
-				<option value="">{$_('search.allTags')}</option>
+				<option value="">{m['search.allTags']()}</option>
 				{#each tags as tag (tag)}
 					<option value={tag}>{tag}</option>
 				{/each}
@@ -79,31 +78,31 @@
 		</FormField>
 	{/if}
 
-	<FormField label={$_('filters.sortLabel')} class={showSearch ? '' : 'md:col-span-2'}>
+	<FormField label={m['filters.sortLabel']()} class={showSearch ? '' : 'md:col-span-2'}>
 		<select
 			name="sort"
 			bind:value={$form.sort}
 			class="min-h-10 rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm transition-colors duration-150 hover:border-ring focus:border-ring focus:outline-2 focus:outline-offset-2 focus:outline-ring"
 		>
-			<option value="publishedAt-desc">{$_('filters.sort.newest')}</option>
-			<option value="publishedAt-asc">{$_('filters.sort.oldest')}</option>
-			<option value="title-asc">{$_('filters.sort.titleAsc')}</option>
-			<option value="title-desc">{$_('filters.sort.titleDesc')}</option>
-			<option value="readingTimeMinutes-asc">{$_('filters.sort.shortest')}</option>
-			<option value="readingTimeMinutes-desc">{$_('filters.sort.longest')}</option>
+			<option value="publishedAt-desc">{m['filters.sort.newest']()}</option>
+			<option value="publishedAt-asc">{m['filters.sort.oldest']()}</option>
+			<option value="title-asc">{m['filters.sort.titleAsc']()}</option>
+			<option value="title-desc">{m['filters.sort.titleDesc']()}</option>
+			<option value="readingTimeMinutes-asc">{m['filters.sort.shortest']()}</option>
+			<option value="readingTimeMinutes-desc">{m['filters.sort.longest']()}</option>
 		</select>
 	</FormField>
 
 	<input type="hidden" name="page" value="1" />
 
 	<div class="flex items-end gap-2">
-		<Button type="submit" class="h-10">{$_('filters.apply')}</Button>
+		<Button type="submit" class="h-10">{m['filters.apply']()}</Button>
 		{#if showSearch}
 			<a
-				href={resolve(action)}
+				href={resolve(localizeHref(`/${action}`) as '/')}
 				class="inline-flex h-10 shrink-0 items-center justify-center rounded-md border border-border bg-secondary px-4 text-sm font-semibold text-secondary-foreground transition-colors duration-150 hover:bg-accent hover:text-accent-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 			>
-				{$_('filters.clear')}
+				{m['filters.clear']()}
 			</a>
 		{/if}
 	</div>

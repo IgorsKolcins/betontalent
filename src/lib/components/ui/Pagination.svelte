@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ArrowLeft, ArrowRight } from '@lucide/svelte';
 	import { Pagination } from 'bits-ui';
-	import { _ } from 'svelte-i18n';
+	import { m } from '$lib/paraglide/messages.js';
 	import { cn } from '$lib/utils/cn';
 
 	let {
@@ -18,8 +18,8 @@
 	{#snippet children({ pages, range })}
 		<div class="my-8 flex items-center justify-center gap-2">
 			<Pagination.PrevButton
-				aria-label={$_('pagination.previous')}
-				title={$_('pagination.previous')}
+				aria-label={m['pagination.previous']()}
+				title={m['pagination.previous']()}
 				class={cn(
 					'inline-flex size-10 cursor-pointer items-center justify-center rounded-md border border-border bg-background text-muted-foreground shadow-sm transition-colors duration-150 hover:bg-accent hover:text-accent-foreground active:scale-[0.98]',
 					'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-background disabled:hover:text-muted-foreground'
@@ -38,8 +38,8 @@
 					{:else}
 						<Pagination.Page
 							{page}
-							aria-label={$_('pagination.page', { values: { page: page.value } })}
-							title={$_('pagination.page', { values: { page: page.value } })}
+							aria-label={m['pagination.page']({ page: page.value })}
+							title={m['pagination.page']({ page: page.value })}
 							class={cn(
 								'inline-flex size-10 cursor-pointer select-none items-center justify-center rounded-md border border-border bg-background text-sm font-medium text-foreground shadow-sm transition-colors duration-150 hover:bg-accent hover:text-accent-foreground active:scale-[0.98]',
 								'data-selected:border-brand data-selected:bg-brand data-selected:text-brand-foreground disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-background disabled:hover:text-foreground'
@@ -51,8 +51,8 @@
 				{/each}
 			</div>
 			<Pagination.NextButton
-				aria-label={$_('pagination.next')}
-				title={$_('pagination.next')}
+				aria-label={m['pagination.next']()}
+				title={m['pagination.next']()}
 				class={cn(
 					'inline-flex size-10 cursor-pointer items-center justify-center rounded-md border border-border bg-background text-muted-foreground shadow-sm transition-colors duration-150 hover:bg-accent hover:text-accent-foreground active:scale-[0.98]',
 					'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-background disabled:hover:text-muted-foreground'
@@ -62,7 +62,7 @@
 			</Pagination.NextButton>
 		</div>
 		<p class="text-center text-xs font-medium text-muted-foreground">
-			{$_('pagination.range', { values: { start: range.start, end: range.end } })}
+			{m['pagination.range']({ start: range.start, end: range.end })}
 		</p>
 	{/snippet}
 </Pagination.Root>
