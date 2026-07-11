@@ -14,9 +14,19 @@
 	}: Pagination.RootProps & { class?: string; count: number; perPage: number } = $props();
 </script>
 
-<Pagination.Root {count} {perPage} bind:page bind:ref class={className} {...restRoot}>
+<Pagination.Root
+	{count}
+	{perPage}
+	bind:page
+	bind:ref
+	class={cn('grid grid-cols-3 my-8 items-center', className)}
+	{...restRoot}
+>
 	{#snippet children({ pages, range })}
-		<div class="my-8 flex items-center justify-center gap-2">
+		<p class="text-xs font-medium text-muted-foreground">
+			{m['pagination.range']({ start: range.start, end: range.end })}
+		</p>
+		<div class="flex items-center justify-center gap-2">
 			<Pagination.PrevButton
 				aria-label={m['pagination.previous']()}
 				title={m['pagination.previous']()}
@@ -61,8 +71,6 @@
 				<ArrowRight aria-hidden="true" class="size-4" />
 			</Pagination.NextButton>
 		</div>
-		<p class="text-center text-xs font-medium text-muted-foreground">
-			{m['pagination.range']({ start: range.start, end: range.end })}
-		</p>
+		<div></div>
 	{/snippet}
 </Pagination.Root>

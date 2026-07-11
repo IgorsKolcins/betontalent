@@ -15,8 +15,8 @@
 <div class="relative min-w-0">
 	<select
 		class={cn(
-			'min-h-10 w-full min-w-0 appearance-none rounded-md border border-input bg-background py-2 pr-9 pl-3 text-sm text-foreground shadow-sm outline-none transition-colors duration-150',
-			'cursor-pointer hover:border-ring focus:border-ring focus:outline-2 focus:outline-offset-2 focus:outline-ring disabled:cursor-not-allowed disabled:opacity-50',
+			'min-h-10 w-full min-w-0 appearance-none rounded-md border border-input bg-background py-2 pr-9 pl-3 text-sm text-foreground shadow-sm transition-colors duration-150',
+			'cursor-pointer hover:border-ring focus:border-ring focus:ring-0 focus:outline-2 focus:outline-offset-2 focus:outline-ring disabled:cursor-not-allowed disabled:opacity-50',
 			className
 		)}
 		bind:value

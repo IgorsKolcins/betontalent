@@ -22,6 +22,7 @@ export const postQueryFormSchema = z.object({
 
 export type PostQueryForm = z.infer<typeof postQueryFormSchema>;
 export type PostSortOption = (typeof POST_SORT_OPTIONS)[number];
+export type PostRouteMode = 'blog' | 'search';
 
 export type PostQuery = PostQueryForm & {
 	// Locale is server-owned context, not a visible form field, but search/sort must use it.
@@ -37,6 +38,27 @@ export function createPostQueryParams(query: Partial<PostQueryForm>): string {
 	if (query.page && query.page > 1) params.set('page', String(query.page));
 
 	return params.toString();
+}
+
+export function queryForPostRoute(
+	mode: PostRouteMode,
+	query: PostQueryForm,
+	page = query.page
+): PostQueryForm {
+	return {
+		...query,
+		q: mode === 'search' ? query.q : '',
+		tag: mode === 'search' ? query.tag : '',
+		page
+	};
+}
+
+export function createPostRouteQueryParams(
+	mode: PostRouteMode,
+	query: PostQueryForm,
+	page = query.page
+): string {
+	return createPostQueryParams(queryForPostRoute(mode, query, page));
 }
 
 export function createApiPostQueryParams(query: Partial<PostQuery>): string {

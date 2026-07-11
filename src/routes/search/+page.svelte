@@ -1,13 +1,10 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
-	import PaginationNav from '$lib/components/blog/PaginationNav.svelte';
-	import PostCard from '$lib/components/blog/PostCard.svelte';
 	import PostControls from '$lib/components/blog/PostControls.svelte';
+	import PostResults from '$lib/components/blog/PostResults.svelte';
 
 	let { data } = $props();
 	const postsPage = $derived(data.postsResult.ok ? data.postsResult.data : undefined);
-	const posts = $derived(postsPage?.posts ?? []);
-	const hasQuery = $derived(Boolean(data.formData.data.q));
 </script>
 
 <svelte:head>
@@ -32,49 +29,12 @@
 		</div>
 
 		<PostControls
-			action="search"
+			mode="search"
 			formData={data.formData}
-			showSearch
 			tags={postsPage?.tags ?? []}
+			totalCount={postsPage?.pagination.total ?? 0}
 		/>
 
-		{#if data.postsResult.ok}
-			{#if postsPage}
-				<p class="text-sm font-medium text-muted-foreground">
-					{#if hasQuery}
-						{m['search.results']({
-							count: postsPage.pagination.total,
-							query: data.formData.data.q
-						})}
-					{:else}
-						{m['search.resultsCount']({ count: postsPage.pagination.total })}
-					{/if}
-				</p>
-			{/if}
-
-			{#if posts.length > 0}
-				<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-					{#each posts as post (post.id)}
-						<PostCard {post} />
-					{/each}
-				</div>
-				{#if postsPage}
-					<PaginationNav
-						action="search"
-						query={data.formData.data}
-						pagination={postsPage.pagination}
-						includeSearch
-					/>
-				{/if}
-			{:else}
-				<p class="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
-					{m['search.noResults']()}
-				</p>
-			{/if}
-		{:else}
-			<p class="rounded-lg border border-border bg-card p-6 text-sm text-destructive">
-				{m['common.error']()}
-			</p>
-		{/if}
+		<PostResults mode="search" query={data.formData.data} result={data.postsResult} />
 	</section>
 </main>

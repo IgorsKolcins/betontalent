@@ -1,12 +1,10 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
-	import PaginationNav from '$lib/components/blog/PaginationNav.svelte';
-	import PostCard from '$lib/components/blog/PostCard.svelte';
 	import PostControls from '$lib/components/blog/PostControls.svelte';
+	import PostResults from '$lib/components/blog/PostResults.svelte';
 
 	let { data } = $props();
 	const postsPage = $derived(data.postsResult.ok ? data.postsResult.data : undefined);
-	const posts = $derived(postsPage?.posts ?? []);
 </script>
 
 <svelte:head>
@@ -30,31 +28,15 @@
 			</p>
 		</div>
 
-		<PostControls action="blog" formData={data.formData} />
-
-		{#if data.postsResult.ok}
-			{#if posts.length > 0}
-				<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-					{#each posts as post (post.id)}
-						<PostCard {post} />
-					{/each}
-				</div>
-				{#if postsPage}
-					<PaginationNav
-						action="blog"
-						query={data.formData.data}
-						pagination={postsPage.pagination}
-					/>
-				{/if}
-			{:else}
-				<p class="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
-					{m['blog.empty']()}
+		{#if postsPage}
+			<div class="flex flex-wrap items-center justify-between gap-4">
+				<p class="text-sm font-medium text-muted-foreground">
+					{m['blog.postsCount']({ count: postsPage.pagination.total })}
 				</p>
-			{/if}
-		{:else}
-			<p class="rounded-lg border border-border bg-card p-6 text-sm text-destructive">
-				{m['common.error']()}
-			</p>
+				<PostControls mode="blog" formData={data.formData} class="shrink-0" />
+			</div>
 		{/if}
+
+		<PostResults mode="blog" query={data.formData.data} result={data.postsResult} />
 	</section>
 </main>

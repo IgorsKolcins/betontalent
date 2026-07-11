@@ -90,33 +90,51 @@
 	--radius-lg: var(--radius);
 	--radius-xl: calc(var(--radius) + 4px);
 }
+@layer base {
+	* {
+		@apply box-border;
+	}
 
-* {
-	@apply box-border;
-}
+	html {
+		@apply bg-background font-sans text-foreground;
+	}
 
-html {
-	@apply bg-background font-sans text-foreground;
-}
+	body {
+		@apply m-0 min-h-screen bg-background text-foreground [background:radial-gradient(circle_at_top_left,color-mix(in_oklch,var(--brand)_12%,transparent),transparent_34rem),var(--background)] [text-rendering:optimizeLegibility];
+	}
 
-body {
-	@apply m-0 min-h-screen bg-background text-foreground [background:radial-gradient(circle_at_top_left,color-mix(in_oklch,var(--brand)_12%,transparent),transparent_34rem),var(--background)] [text-rendering:optimizeLegibility];
-}
+	a {
+		@apply text-inherit;
+	}
 
-a {
-	@apply text-inherit;
-}
+	input[data-custom-search-input] {
+		@apply appearance-none border-0 focus:border-0 focus:ring-0 focus-visible:outline-none;
+	}
 
-:focus-visible {
-	@apply outline-2 outline-offset-3 outline-ring;
-}
+	input[data-custom-search-input]::-webkit-search-cancel-button,
+	input[data-custom-search-input]::-webkit-search-decoration {
+		@apply hidden appearance-none;
+	}
 
-.container {
-	@apply mx-auto w-[min(100%-2rem,var(--container))];
-}
+	input[data-custom-search-input]::-ms-clear {
+		@apply hidden;
+	}
 
-@media (width >= 48rem) {
+	:focus-visible {
+		@apply outline-2 outline-offset-3 outline-ring;
+	}
+
 	.container {
-		@apply w-[min(100%-3rem,var(--container))];
+		@apply mx-auto w-[min(100%-2rem,var(--container))];
+	}
+
+	@media (width >= 48rem) {
+		.container {
+			@apply w-[min(100%-3rem,var(--container))];
+		}
+	}
+
+	h1 {
+		@apply text-4xl leading-tight font-bold text-foreground md:text-5xl;
 	}
 }

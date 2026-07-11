@@ -3,34 +3,25 @@
 	import { resolve } from '$app/paths';
 	import { localizeHref } from '$lib/paraglide/runtime.js';
 	import {
-		createPostQueryParams,
+		createPostRouteQueryParams,
 		type PostQueryForm,
-		type PostSortOption
+		type PostRouteMode
 	} from '$lib/api/posts/query';
 	import type { PostsResponse } from '$lib/api/posts/schema';
 	import Pagination from '$lib/components/ui/Pagination.svelte';
 
-	type PostRoute = 'blog' | 'search';
-
 	let {
-		action,
+		mode,
 		query,
-		pagination,
-		includeSearch = false
+		pagination
 	}: {
-		action: PostRoute;
+		mode: PostRouteMode;
 		query: PostQueryForm;
 		pagination: PostsResponse['pagination'];
-		includeSearch?: boolean;
 	} = $props();
 
 	function queryStringFor(page: number): string {
-		const params = createPostQueryParams({
-			q: includeSearch ? query.q : '',
-			tag: includeSearch ? query.tag : '',
-			sort: query.sort as PostSortOption,
-			page
-		});
+		const params = createPostRouteQueryParams(mode, query, page);
 
 		return params ? `?${params}` : '';
 	}
@@ -38,7 +29,7 @@
 	function navigateToPage(page: number) {
 		const queryString = queryStringFor(page);
 
-		void goto(resolve(localizeHref(`/${action}${queryString}`) as '/'), {
+		void goto(resolve(localizeHref(`/${mode}${queryString}`) as '/'), {
 			keepFocus: true,
 			noScroll: false
 		});
