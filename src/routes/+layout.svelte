@@ -2,7 +2,6 @@
 	import './layout.css';
 	import { untrack } from 'svelte';
 	import favicon from '$lib/assets/favicon.svg';
-	import Header from '$lib/components/Header.svelte';
 	import { createThemeContext } from '$lib/contexts/Theme.svelte';
 
 	let { children, data } = $props();
@@ -14,5 +13,4 @@
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
-<Header />
 {@render children()}
