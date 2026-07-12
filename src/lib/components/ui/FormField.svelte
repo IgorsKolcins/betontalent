@@ -6,9 +6,16 @@
 	let {
 		class: className,
 		error,
+		errorId,
 		label,
 		children
-	}: { class?: string; error?: string; label?: string; children?: Snippet } = $props();
+	}: {
+		class?: string;
+		error?: string;
+		errorId?: string;
+		label?: string;
+		children?: Snippet;
+	} = $props();
 </script>
 
 <div class={cn('space-y-1.5 pb-6', { 'pt-6': !label }, className)}>
@@ -21,7 +28,7 @@
 		{@render children?.()}
 	{/if}
 	{#if error}
-		<p class="-mb-5 text-xs font-medium text-destructive" data-error-message>
+		<p id={errorId} class="-mb-5 text-xs font-medium text-destructive" data-error-message>
 			{error}
 		</p>
 	{/if}

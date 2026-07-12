@@ -1,5 +1,9 @@
 # sv
 
+## Demo authentication
+
+Copy `.env.example` to `.env` and replace `SESSION_SECRET` with any non-empty random string before using demo authentication. Demo account credentials remain in the supplied mock-data README.
+
 Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
 
 ## Creating a project

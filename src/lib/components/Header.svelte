@@ -20,37 +20,46 @@
 </script>
 
 <header class="border-b border-border bg-background/90 backdrop-blur">
-	<div class="container flex h-14 items-center justify-between gap-4">
+	<div class="container grid grid-cols-3 h-14 items-center gap-4">
 		<a
 			href={resolve(localizeHref('/') as '/')}
 			class="text-sm font-bold tracking-[0.08em] text-foreground uppercase"
 		>
 			{m['brand.name']()}
 		</a>
-		<nav class="hidden items-center gap-1 md:flex" aria-label={m['nav.primary']()}>
-			<a
-				href={resolve(localizeHref('/blog') as '/')}
-				class="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:bg-accent hover:text-accent-foreground"
-				>{m['nav.blog']()}</a
-			>
-			<a
-				href={resolve(localizeHref('/search') as '/')}
-				class="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:bg-accent hover:text-accent-foreground"
-				>{m['nav.search']()}</a
-			>
+		<nav class="hidden items-center gap-1 md:flex justify-center" aria-label={m['nav.primary']()}>
+			<Button href={resolve(localizeHref('/blog') as '/')} variant="ghost">
+				{m['nav.blog']()}
+			</Button>
+			<Button href={resolve(localizeHref('/search') as '/')} variant="ghost">
+				{m['nav.search']()}
+			</Button>
 		</nav>
-		<div class="flex items-center gap-2">
-			<a
+		<div class="flex items-center gap-2 justify-end">
+			{#if page.data.user}
+				<Button
+					href={resolve(localizeHref('/dashboard') as '/dashboard')}
+					class="hidden h-9 sm:inline-flex"
+				>
+					{m['nav.dashboard']()}
+				</Button>
+			{:else}
+				<Button href={resolve(localizeHref('/login') as '/login')} class="h-9">
+					{m['nav.login']()}
+				</Button>
+			{/if}
+			<Button
 				href={localeHref}
+				variant="secondary"
 				data-sveltekit-reload
-				class="inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-md border border-border bg-secondary px-3 text-xs font-semibold text-secondary-foreground transition-colors duration-150 hover:bg-accent hover:text-accent-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:scale-[0.98]"
+				class="h-9"
 				aria-label={m['language.toggle']({ locale: nextLocale.toUpperCase() })}
 				title={m['language.toggle']({ locale: nextLocale.toUpperCase() })}
 			>
 				<span class={activeLocale === 'en' ? 'text-foreground' : 'text-muted-foreground'}>EN</span>
 				<span class="text-muted-foreground">/</span>
 				<span class={activeLocale === 'de' ? 'text-foreground' : 'text-muted-foreground'}>DE</span>
-			</a>
+			</Button>
 			<Button
 				variant="icon"
 				onclick={() => theme.toggle()}
