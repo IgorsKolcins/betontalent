@@ -8,11 +8,20 @@ import {
 import {
 	rawPostSchema,
 	type Locale,
+	type LocalizedPost,
 	type RawPost,
 	type PostsResponse
 } from '$lib/api/posts/schema';
 
 const posts = rawPostSchema.array().parse(postsJson);
+
+export function getPost(slug: string, locale: Locale = 'en'): LocalizedPost | undefined {
+	const post = posts.find((candidate) => candidate.slug === slug);
+	if (!post) return undefined;
+
+	const { translations, ...shared } = post;
+	return { ...shared, ...translations[locale] };
+}
 
 export function listPostTags(): string[] {
 	return [...new Set(posts.flatMap((post) => post.tags))].sort((first, second) =>
