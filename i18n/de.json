@@ -59,6 +59,7 @@
 	"login.title": "Anmelden",
 	"login.description": "Verwende ein Demokonto, um auf das Dashboard zuzugreifen.",
 	"login.email": "E-Mail",
+	"login.emailPlaceholder": "m@beispiel.de",
 	"login.password": "Passwort",
 	"login.submit": "Anmelden",
 	"login.submitting": "Anmeldung läuft...",

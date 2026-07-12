@@ -59,6 +59,7 @@
 	"login.title": "Sign in",
 	"login.description": "Use a demo account to access the dashboard.",
 	"login.email": "Email",
+	"login.emailPlaceholder": "m@example.com",
 	"login.password": "Password",
 	"login.submit": "Sign in",
 	"login.submitting": "Signing in...",
