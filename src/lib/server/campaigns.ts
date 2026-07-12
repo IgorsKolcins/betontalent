@@ -1,11 +1,19 @@
 import itemsJson from '../../../mocks/items.json';
 import { z } from 'zod';
+import {
+	CAMPAIGNS_PER_PAGE,
+	CAMPAIGN_CHANNELS,
+	CAMPAIGN_STATUSES,
+	splitCampaignSort,
+	type CampaignQuery,
+	type CampaignSortField
+} from '$lib/campaigns/query';
 
 const campaignSchema = z.object({
 	id: z.string(),
 	name: z.string(),
-	status: z.enum(['draft', 'scheduled', 'active', 'paused', 'completed', 'archived']),
-	channel: z.enum(['email', 'sms', 'web', 'social', 'push']),
+	status: z.enum(CAMPAIGN_STATUSES),
+	channel: z.enum(CAMPAIGN_CHANNELS),
 	owner: z.object({ id: z.string(), name: z.string() }),
 	budget: z.number().nonnegative(),
 	spent: z.number().nonnegative(),
@@ -21,6 +29,17 @@ const campaignSchema = z.object({
 const campaigns = z.array(campaignSchema).parse(itemsJson);
 
 export type Campaign = z.infer<typeof campaignSchema>;
+
+export type CampaignPage = {
+	campaigns: Campaign[];
+	pagination: {
+		page: number;
+		perPage: number;
+		total: number;
+		totalPages: number;
+		totalCount: number;
+	};
+};
 
 export type CampaignSummary = {
 	totalCount: number;
@@ -48,6 +67,58 @@ export function getCampaignSummary(): CampaignSummary {
 	};
 }
 
-export function getCampaigns(): Campaign[] {
-	return campaigns;
+export function getCampaignPage(query: CampaignQuery, locale: string): CampaignPage {
+	const normalizedQuery = query.q.toLocaleLowerCase(locale);
+	const filteredCampaigns = campaigns.filter(
+		(campaign) =>
+			(!normalizedQuery || campaign.name.toLocaleLowerCase(locale).includes(normalizedQuery)) &&
+			(!query.status || campaign.status === query.status) &&
+			(!query.channel || campaign.channel === query.channel)
+	);
+	const { field, direction } = splitCampaignSort(query.sort);
+	const collator = new Intl.Collator(locale, { numeric: true, sensitivity: 'base' });
+	const sortedCampaigns = [...filteredCampaigns].sort((left, right) => {
+		const comparison = compareCampaigns(left, right, field, collator);
+
+		return (direction === 'asc' ? comparison : -comparison) || left.id.localeCompare(right.id);
+	});
+	const total = sortedCampaigns.length;
+	const totalPages = Math.max(1, Math.ceil(total / CAMPAIGNS_PER_PAGE));
+	const page = Math.min(query.page, totalPages);
+	const start = (page - 1) * CAMPAIGNS_PER_PAGE;
+
+	return {
+		campaigns: sortedCampaigns.slice(start, start + CAMPAIGNS_PER_PAGE),
+		pagination: {
+			page,
+			perPage: CAMPAIGNS_PER_PAGE,
+			total,
+			totalPages,
+			totalCount: campaigns.length
+		}
+	};
+}
+
+function compareCampaigns(
+	left: Campaign,
+	right: Campaign,
+	field: CampaignSortField,
+	collator: Intl.Collator
+): number {
+	switch (field) {
+		case 'name':
+			return collator.compare(left.name, right.name);
+		case 'status':
+			return collator.compare(left.status, right.status);
+		case 'channel':
+			return collator.compare(left.channel, right.channel);
+		case 'owner':
+			return collator.compare(left.owner.name, right.owner.name);
+		case 'budget':
+		case 'spent':
+		case 'ctr':
+			return left[field] - right[field];
+		case 'updatedAt':
+			return left.updatedAt.localeCompare(right.updatedAt);
+	}
 }

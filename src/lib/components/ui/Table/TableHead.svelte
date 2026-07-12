@@ -1,13 +1,13 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { HTMLAttributes } from 'svelte/elements';
+	import type { HTMLThAttributes } from 'svelte/elements';
 	import { cn } from '$lib/utils/cn';
 
 	let {
 		children,
 		class: className,
 		...restProps
-	}: HTMLAttributes<HTMLTableCellElement> & { children: Snippet; class?: string } = $props();
+	}: HTMLThAttributes & { children: Snippet; class?: string } = $props();
 </script>
 
 <th

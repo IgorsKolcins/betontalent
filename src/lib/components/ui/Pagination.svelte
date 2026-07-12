@@ -19,14 +19,14 @@
 	{perPage}
 	bind:page
 	bind:ref
-	class={cn('grid grid-cols-3 my-8 items-center', className)}
+	class={cn('grid grid-cols-12 my-8 items-center', className)}
 	{...restRoot}
 >
 	{#snippet children({ pages, range })}
-		<p class="text-xs font-medium text-muted-foreground">
+		<p class="col-start-1 col-end-3 text-xs font-medium text-muted-foreground">
 			{m['pagination.range']({ start: range.start, end: range.end })}
 		</p>
-		<div class="flex items-center justify-center gap-2">
+		<div class="col-start-3 col-end-11 flex items-center justify-center gap-2">
 			<Pagination.PrevButton
 				aria-label={m['pagination.previous']()}
 				title={m['pagination.previous']()}
@@ -71,6 +71,6 @@
 				<ArrowRight aria-hidden="true" class="size-4" />
 			</Pagination.NextButton>
 		</div>
-		<div></div>
+		<div class="col-start-11 col-end-13"></div>
 	{/snippet}
 </Pagination.Root>

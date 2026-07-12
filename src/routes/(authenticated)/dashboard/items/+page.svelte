@@ -1,7 +1,19 @@
 <script lang="ts">
 	import { getLocale } from '$lib/paraglide/runtime.js';
 	import { m } from '$lib/paraglide/messages.js';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+	import { localizeHref } from '$lib/paraglide/runtime.js';
 	import type { PageData } from './$types';
+	import {
+		createCampaignQueryParams,
+		splitCampaignSort,
+		type CampaignSort,
+		type CampaignSortDirection,
+		type CampaignSortField
+	} from '$lib/campaigns/query';
+	import CampaignControls from '$lib/components/dashboard/CampaignControls.svelte';
+	import CampaignPagination from '$lib/components/dashboard/CampaignPagination.svelte';
 	import Avatar from '$lib/components/ui/Avatar.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import {
@@ -9,9 +21,9 @@
 		TableBody,
 		TableCaption,
 		TableCell,
-		TableHead,
 		TableHeader,
-		TableRow
+		TableRow,
+		TableSortableHead
 	} from '$lib/components/ui/Table';
 
 	let { data }: { data: PageData } = $props();
@@ -38,6 +50,56 @@
 		completed: 'completed',
 		archived: 'archived'
 	} as const;
+	const defaultSortDirections: Record<CampaignSortField, CampaignSortDirection> = {
+		name: 'asc',
+		status: 'asc',
+		channel: 'asc',
+		owner: 'asc',
+		budget: 'desc',
+		spent: 'desc',
+		ctr: 'desc',
+		updatedAt: 'desc'
+	};
+	const query = $derived(data.query);
+	const activeSort = $derived(splitCampaignSort(query.sort));
+	const hasFilters = $derived(Boolean(query.q || query.status || query.channel));
+
+	function nextSort(field: CampaignSortField): CampaignSort {
+		const direction =
+			activeSort.field === field
+				? activeSort.direction === 'asc'
+					? 'desc'
+					: 'asc'
+				: defaultSortDirections[field];
+
+		return `${field}-${direction}`;
+	}
+
+	function sortHref(field: CampaignSortField): string {
+		const params = createCampaignQueryParams({ ...query, sort: nextSort(field), page: 1 });
+		const path = params ? `/dashboard/items?${params}` : '/dashboard/items';
+
+		return localizeHref(path);
+	}
+
+	function sortLabel(field: CampaignSortField, label: string): string {
+		const direction = nextSort(field).endsWith('-asc') ? 'ascending' : 'descending';
+
+		return m['dashboard.items.sort']({
+			column: label,
+			direction: m[`dashboard.items.sort.${direction}`]()
+		});
+	}
+
+	function sortDirection(field: CampaignSortField): 'ascending' | 'descending' | 'none' {
+		if (activeSort.field !== field) return 'none';
+
+		return activeSort.direction === 'asc' ? 'ascending' : 'descending';
+	}
+
+	function handleSort(field: CampaignSortField): void {
+		void goto(resolve(sortHref(field) as '/dashboard/items'));
+	}
 </script>
 
 <svelte:head>
@@ -49,26 +111,79 @@
 	<header>
 		<h1 id="items-title">{m['dashboard.items.title']()}</h1>
 		<p class="mt-2 text-sm text-muted-foreground">
-			{m['dashboard.items.count']({ count: data.campaigns.length })}
+			{#if hasFilters}
+				{m['dashboard.items.filteredCount']({
+					count: data.campaignsPage.pagination.total,
+					total: data.campaignsPage.pagination.totalCount
+				})}
+			{:else}
+				{m['dashboard.items.count']({ count: data.campaignsPage.pagination.totalCount })}
+			{/if}
 		</p>
 	</header>
+
+	<CampaignControls formData={data.formData} />
 
 	<Table scrollAreaLabel={m['dashboard.items.tableLabel']()}>
 		<TableCaption class="sr-only">{m['dashboard.items.tableCaption']()}</TableCaption>
 		<TableHeader>
 			<TableRow class="hover:bg-transparent">
-				<TableHead class="min-w-64">{m['dashboard.items.column.name']()}</TableHead>
-				<TableHead>{m['dashboard.items.column.status']()}</TableHead>
-				<TableHead>{m['dashboard.items.column.channel']()}</TableHead>
-				<TableHead>{m['dashboard.items.column.owner']()}</TableHead>
-				<TableHead class="text-right">{m['dashboard.items.column.budget']()}</TableHead>
-				<TableHead class="text-right">{m['dashboard.items.column.spent']()}</TableHead>
-				<TableHead class="text-right">{m['dashboard.items.column.ctr']()}</TableHead>
-				<TableHead>{m['dashboard.items.column.updated']()}</TableHead>
+				<TableSortableHead
+					class="min-w-64"
+					onclick={() => handleSort('name')}
+					label={m['dashboard.items.column.name']()}
+					sortDirection={sortDirection('name')}
+					sortLabel={sortLabel('name', m['dashboard.items.column.name']())}
+				/>
+				<TableSortableHead
+					onclick={() => handleSort('status')}
+					label={m['dashboard.items.column.status']()}
+					sortDirection={sortDirection('status')}
+					sortLabel={sortLabel('status', m['dashboard.items.column.status']())}
+				/>
+				<TableSortableHead
+					onclick={() => handleSort('channel')}
+					label={m['dashboard.items.column.channel']()}
+					sortDirection={sortDirection('channel')}
+					sortLabel={sortLabel('channel', m['dashboard.items.column.channel']())}
+				/>
+				<TableSortableHead
+					onclick={() => handleSort('owner')}
+					label={m['dashboard.items.column.owner']()}
+					sortDirection={sortDirection('owner')}
+					sortLabel={sortLabel('owner', m['dashboard.items.column.owner']())}
+				/>
+				<TableSortableHead
+					class="text-right"
+					onclick={() => handleSort('budget')}
+					label={m['dashboard.items.column.budget']()}
+					sortDirection={sortDirection('budget')}
+					sortLabel={sortLabel('budget', m['dashboard.items.column.budget']())}
+				/>
+				<TableSortableHead
+					class="text-right"
+					onclick={() => handleSort('spent')}
+					label={m['dashboard.items.column.spent']()}
+					sortDirection={sortDirection('spent')}
+					sortLabel={sortLabel('spent', m['dashboard.items.column.spent']())}
+				/>
+				<TableSortableHead
+					class="text-right"
+					onclick={() => handleSort('ctr')}
+					label={m['dashboard.items.column.ctr']()}
+					sortDirection={sortDirection('ctr')}
+					sortLabel={sortLabel('ctr', m['dashboard.items.column.ctr']())}
+				/>
+				<TableSortableHead
+					onclick={() => handleSort('updatedAt')}
+					label={m['dashboard.items.column.updated']()}
+					sortDirection={sortDirection('updatedAt')}
+					sortLabel={sortLabel('updatedAt', m['dashboard.items.column.updated']())}
+				/>
 			</TableRow>
 		</TableHeader>
 		<TableBody>
-			{#each data.campaigns as campaign (campaign.id)}
+			{#each data.campaignsPage.campaigns as campaign (campaign.id)}
 				<TableRow>
 					<TableCell class="font-medium text-foreground">{campaign.name}</TableCell>
 					<TableCell>
@@ -94,7 +209,15 @@
 					</TableCell>
 					<TableCell>{dateFormatter.format(new Date(campaign.updatedAt))}</TableCell>
 				</TableRow>
+			{:else}
+				<TableRow class="hover:bg-transparent">
+					<TableCell colspan={8} class="h-28 text-center text-muted-foreground">
+						{hasFilters ? m['dashboard.items.noResults']() : m['dashboard.items.empty']()}
+					</TableCell>
+				</TableRow>
 			{/each}
 		</TableBody>
 	</Table>
+
+	<CampaignPagination {query} pagination={data.campaignsPage.pagination} />
 </main>
