@@ -20,6 +20,8 @@ const campaignSchema = z.object({
 
 const campaigns = z.array(campaignSchema).parse(itemsJson);
 
+export type Campaign = z.infer<typeof campaignSchema>;
+
 export type CampaignSummary = {
 	totalCount: number;
 	activeCount: number;
@@ -44,4 +46,8 @@ export function getCampaignSummary(): CampaignSummary {
 		totalBudget: totals.totalBudget,
 		aggregateCtr: totals.impressions === 0 ? 0 : totals.clicks / totals.impressions
 	};
+}
+
+export function getCampaigns(): Campaign[] {
+	return campaigns;
 }
