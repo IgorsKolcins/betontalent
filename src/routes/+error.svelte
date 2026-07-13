@@ -2,6 +2,7 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { ArrowLeft } from '@lucide/svelte';
+	import Container from '$lib/components/ui/Container.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import { localizeHref } from '$lib/paraglide/runtime.js';
 
@@ -19,7 +20,7 @@
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
-<main class="container grid min-h-[calc(100vh-3.5rem)] place-items-center py-12">
+<Container as="main" class="grid min-h-[calc(100vh-3.5rem)] place-items-center py-12">
 	<section
 		class="relative w-full max-w-3xl overflow-hidden rounded-xl border border-border bg-card px-6 py-16 text-center shadow-sm md:px-12 md:py-24"
 	>
@@ -57,4 +58,4 @@
 			</a>
 		</div>
 	</section>
-</main>
+</Container>

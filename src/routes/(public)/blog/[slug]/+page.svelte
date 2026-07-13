@@ -3,6 +3,7 @@
 	import { ArrowLeft } from '@lucide/svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
+	import Container from '$lib/components/ui/Container.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import { getLocale, localizeHref } from '$lib/paraglide/runtime.js';
 	import { absoluteUrl } from '$lib/seo';
@@ -51,7 +52,7 @@
 </svelte:head>
 
 <main class="min-h-screen py-8 md:py-12">
-	<article class="container max-w-3xl">
+	<Container as="article" class="max-w-3xl">
 		<Button href={backHref} variant="ghost" class="mb-8 -ml-3">
 			<ArrowLeft class="size-4" aria-hidden="true" />
 			{m['blog.back']()}
@@ -93,5 +94,5 @@
 				<p>{paragraph}</p>
 			{/each}
 		</div>
-	</article>
+	</Container>
 </main>

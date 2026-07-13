@@ -4,6 +4,7 @@
 	import { House, LayoutDashboard, List, Menu, Moon, Sun } from '@lucide/svelte';
 	import type { Snippet } from 'svelte';
 	import Button from '$lib/components/ui/Button.svelte';
+	import Drawer from '$lib/components/ui/Drawer.svelte';
 	import {
 		Sidebar,
 		SidebarContent,
@@ -38,6 +39,67 @@
 	);
 </script>
 
+{#snippet navigation(close?: () => void)}
+	<SidebarContent>
+		<SidebarGroup>
+			<SidebarMenu aria-label={m['dashboard.sidebar.navigationLabel']()}>
+				<SidebarMenuButton
+					href={dashboardHref}
+					isActive={currentPath === '/dashboard'}
+					onclick={close}
+				>
+					<LayoutDashboard aria-hidden="true" class="size-4" />
+					<span>{m['nav.dashboard']()}</span>
+				</SidebarMenuButton>
+				<SidebarMenuButton
+					href={itemsHref}
+					isActive={currentPath.startsWith('/dashboard/items')}
+					onclick={close}
+				>
+					<List aria-hidden="true" class="size-4" />
+					<span>{m['nav.items']()}</span>
+				</SidebarMenuButton>
+				<SidebarMenuButton href={homeHref} isActive={currentPath === '/'} onclick={close}>
+					<House aria-hidden="true" class="size-4" />
+					<span>{m['nav.home']()}</span>
+				</SidebarMenuButton>
+			</SidebarMenu>
+		</SidebarGroup>
+	</SidebarContent>
+{/snippet}
+
+{#snippet footer(close?: () => void)}
+	<SidebarFooter>
+		<div class="flex items-center gap-2">
+			<Button
+				href={localeHref}
+				variant="secondary"
+				data-sveltekit-reload
+				onclick={close}
+				class="h-9 flex-1"
+				aria-label={m['language.toggle']({ locale: nextLocale.toUpperCase() })}
+				title={m['language.toggle']({ locale: nextLocale.toUpperCase() })}
+			>
+				<span class={activeLocale === 'en' ? 'text-foreground' : 'text-muted-foreground'}>EN</span>
+				<span class="text-muted-foreground">/</span>
+				<span class={activeLocale === 'de' ? 'text-foreground' : 'text-muted-foreground'}>DE</span>
+			</Button>
+			<Button
+				variant="icon"
+				onclick={() => theme.toggle()}
+				aria-label={theme.mode === 'dark' ? m['theme.switchToLight']() : m['theme.switchToDark']()}
+				title={theme.mode === 'dark' ? m['theme.switchToLight']() : m['theme.switchToDark']()}
+			>
+				{#if theme.mode === 'dark'}
+					<Sun aria-hidden="true" class="size-4" />
+				{:else}
+					<Moon aria-hidden="true" class="size-4" />
+				{/if}
+			</Button>
+		</div>
+	</SidebarFooter>
+{/snippet}
+
 <SidebarProvider>
 	<Sidebar>
 		<SidebarHeader>
@@ -46,57 +108,8 @@
 			</a>
 		</SidebarHeader>
 
-		<SidebarContent>
-			<SidebarGroup>
-				<SidebarMenu aria-label={m['dashboard.sidebar.navigationLabel']()}>
-					<SidebarMenuButton href={dashboardHref} isActive={currentPath === '/dashboard'}>
-						<LayoutDashboard aria-hidden="true" class="size-4" />
-						<span>{m['nav.dashboard']()}</span>
-					</SidebarMenuButton>
-					<SidebarMenuButton href={itemsHref} isActive={currentPath.startsWith('/dashboard/items')}>
-						<List aria-hidden="true" class="size-4" />
-						<span>{m['nav.items']()}</span>
-					</SidebarMenuButton>
-					<SidebarMenuButton href={homeHref} isActive={currentPath === '/'}>
-						<House aria-hidden="true" class="size-4" />
-						<span>{m['nav.home']()}</span>
-					</SidebarMenuButton>
-				</SidebarMenu>
-			</SidebarGroup>
-		</SidebarContent>
-
-		<SidebarFooter>
-			<div class="flex items-center gap-2">
-				<Button
-					href={localeHref}
-					variant="secondary"
-					data-sveltekit-reload
-					class="h-9 flex-1"
-					aria-label={m['language.toggle']({ locale: nextLocale.toUpperCase() })}
-					title={m['language.toggle']({ locale: nextLocale.toUpperCase() })}
-				>
-					<span class={activeLocale === 'en' ? 'text-foreground' : 'text-muted-foreground'}>EN</span
-					>
-					<span class="text-muted-foreground">/</span>
-					<span class={activeLocale === 'de' ? 'text-foreground' : 'text-muted-foreground'}>DE</span
-					>
-				</Button>
-				<Button
-					variant="icon"
-					onclick={() => theme.toggle()}
-					aria-label={theme.mode === 'dark'
-						? m['theme.switchToLight']()
-						: m['theme.switchToDark']()}
-					title={theme.mode === 'dark' ? m['theme.switchToLight']() : m['theme.switchToDark']()}
-				>
-					{#if theme.mode === 'dark'}
-						<Sun aria-hidden="true" class="size-4" />
-					{:else}
-						<Moon aria-hidden="true" class="size-4" />
-					{/if}
-				</Button>
-			</div>
-		</SidebarFooter>
+		{@render navigation()}
+		{@render footer()}
 	</Sidebar>
 
 	<SidebarInset>
@@ -106,14 +119,34 @@
 			<a href={dashboardHref} class="text-sm font-bold tracking-[0.08em] text-foreground uppercase">
 				{m['brand.shortName']()}
 			</a>
-			<Button
-				variant="icon"
-				disabled
-				aria-label={m['dashboard.sidebar.mobileMenuUnavailable']()}
-				title={m['dashboard.sidebar.mobileMenuUnavailable']()}
+			<Drawer
+				title={m['dashboard.sidebar.navigationLabel']()}
+				closeLabel={m['dashboard.sidebar.closeMenu']()}
 			>
-				<Menu aria-hidden="true" class="size-4" />
-			</Button>
+				{#snippet trigger(triggerProps)}
+					<Button
+						{...triggerProps}
+						variant="icon"
+						aria-label={m['dashboard.sidebar.openMenu']()}
+						title={m['dashboard.sidebar.openMenu']()}
+					>
+						<Menu aria-hidden="true" class="size-4" />
+					</Button>
+				{/snippet}
+				{#snippet children({ close })}
+					<SidebarHeader class="pr-14">
+						<a
+							href={dashboardHref}
+							onclick={close}
+							class="text-sm font-bold tracking-[0.08em] text-foreground uppercase"
+						>
+							{m['brand.name']()}
+						</a>
+					</SidebarHeader>
+					{@render navigation(close)}
+					{@render footer(close)}
+				{/snippet}
+			</Drawer>
 		</div>
 		<SidebarInsetContainer>
 			{@render children()}

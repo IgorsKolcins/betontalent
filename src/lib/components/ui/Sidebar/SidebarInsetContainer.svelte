@@ -16,7 +16,7 @@
 
 <div
 	data-slot="sidebar-inset-container"
-	class={cn('mx-auto w-full max-w-(--sidebar-content-max-width) p-4 sm:p-6 lg:p-10', className)}
+	class={cn('mx-auto w-full max-w-(--sidebar-content-max-width) p-5 sm:p-6 lg:p-10', className)}
 >
 	{@render children()}
 </div>

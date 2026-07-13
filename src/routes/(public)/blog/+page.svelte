@@ -2,6 +2,7 @@
 	import { m } from '$lib/paraglide/messages.js';
 	import PostControls from '$lib/components/blog/PostControls.svelte';
 	import PostResults from '$lib/components/blog/PostResults.svelte';
+	import Container from '$lib/components/ui/Container.svelte';
 
 	let { data } = $props();
 	const postsPage = $derived(data.postsResult.ok ? data.postsResult.data : undefined);
@@ -18,7 +19,7 @@
 </svelte:head>
 
 <main class="min-h-screen py-10 md:py-14">
-	<section class="container space-y-8" aria-labelledby="blog-title">
+	<Container as="section" class="space-y-8" aria-labelledby="blog-title">
 		<div class="max-w-2xl space-y-3">
 			<h1 id="blog-title" class="text-4xl leading-tight font-bold text-foreground md:text-5xl">
 				{m['blog.title']()}
@@ -38,5 +39,5 @@
 		{/if}
 
 		<PostResults mode="blog" query={data.formData.data} result={data.postsResult} />
-	</section>
+	</Container>
 </main>

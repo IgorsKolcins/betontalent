@@ -89,6 +89,46 @@
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
 	--radius-xl: calc(var(--radius) + 4px);
+	--animate-drawer-in: drawer-in 200ms ease-in-out both;
+	--animate-drawer-out: drawer-out 150ms ease-in-out both;
+	--animate-overlay-in: overlay-in 200ms ease-in-out both;
+	--animate-overlay-out: overlay-out 150ms ease-in-out both;
+
+	@keyframes drawer-in {
+		from {
+			transform: translateX(100%);
+		}
+		to {
+			transform: translateX(0);
+		}
+	}
+
+	@keyframes drawer-out {
+		from {
+			transform: translateX(0);
+		}
+		to {
+			transform: translateX(100%);
+		}
+	}
+
+	@keyframes overlay-in {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	@keyframes overlay-out {
+		from {
+			opacity: 1;
+		}
+		to {
+			opacity: 0;
+		}
+	}
 }
 @layer base {
 	* {
@@ -122,16 +162,6 @@
 
 	:focus-visible {
 		@apply outline-2 outline-offset-3 outline-ring;
-	}
-
-	.container {
-		@apply mx-auto w-[min(100%-2rem,var(--container))];
-	}
-
-	@media (width >= 48rem) {
-		.container {
-			@apply w-[min(100%-3rem,var(--container))];
-		}
 	}
 
 	h1 {
