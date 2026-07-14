@@ -4,6 +4,10 @@
 
 Copy `.env.example` to `.env` and replace `SESSION_SECRET` with any non-empty random string before using demo authentication. Demo account credentials remain in the supplied mock-data README.
 
+## Mock data boundaries
+
+The supplied JSON is statically imported on the server so malformed fixtures fail during startup rather than reaching page components. Executable Zod contracts validate posts, campaigns, users, and the tag taxonomy while providing the inferred TypeScript types. Tag slugs stay stable in filter URLs; labels are localized from `mocks/tags.json` at the API boundary.
+
 Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
 
 ## Creating a project

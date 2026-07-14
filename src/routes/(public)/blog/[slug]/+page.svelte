@@ -24,7 +24,7 @@
 		datePublished: data.post.publishedAt,
 		author: { '@type': 'Person', name: data.post.author.name },
 		mainEntityOfPage: data.seo.canonical,
-		keywords: data.post.tags.join(', '),
+		keywords: data.post.tags.map((tag) => tag.label).join(', '),
 		breadcrumb: {
 			'@type': 'BreadcrumbList',
 			itemListElement: [
@@ -70,7 +70,7 @@
 
 		<header class="space-y-5 border-b border-border pb-8">
 			<div class="flex flex-wrap gap-2">
-				{#each data.post.tags as tag (tag)}<Badge variant="outline">{tag}</Badge>{/each}
+				{#each data.post.tags as tag (tag.slug)}<Badge variant="outline">{tag.label}</Badge>{/each}
 			</div>
 			<h1 class="text-4xl leading-tight font-bold text-foreground md:text-5xl">
 				{data.post.title}

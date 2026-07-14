@@ -47,8 +47,8 @@
 		></div>
 		<CardHeader>
 			<div class="mb-2 flex flex-wrap gap-1.5">
-				{#each post.tags as tag (tag)}
-					<Badge variant="outline">{tag}</Badge>
+				{#each post.tags as tag (tag.slug)}
+					<Badge variant="outline">{tag.label}</Badge>
 				{/each}
 			</div>
 			<CardTitle class="mb-2 line-clamp-2 break-words">{post.title}</CardTitle>

@@ -19,7 +19,7 @@ const post: LocalizedPost = {
 	title: 'Fast content',
 	excerpt: 'A practical guide to shipping a fast content experience.',
 	body: 'Post body',
-	tags: ['performance'],
+	tags: [{ slug: 'performance', label: 'Performance' }],
 	author: { id: 'author_1', name: 'Anna Becker', avatarColor: '#f59e0b' },
 	publishedAt: '2026-05-28T00:00:00Z',
 	readingTimeMinutes: 4,
@@ -31,7 +31,7 @@ function successfulResult(posts: LocalizedPost[]): ApiResult<PostsResponse> {
 		ok: true,
 		data: {
 			posts,
-			tags: ['performance'],
+			tags: [{ slug: 'performance', label: 'Performance' }],
 			pagination: {
 				page: 1,
 				perPage: 6,

@@ -13,7 +13,7 @@ describe('PostControls', () => {
 				sort: 'title-asc',
 				page: 3
 			},
-			tags: ['performance'],
+			tags: [{ slug: 'performance', label: 'Performance' }],
 			totalCount: 1
 		});
 

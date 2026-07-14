@@ -1,4 +1,5 @@
 import postsJson from '../../../mocks/posts.json';
+import tagsJson from '../../../mocks/tags.json';
 import {
 	DEFAULT_POST_SORT,
 	POSTS_PER_PAGE,
@@ -7,26 +8,37 @@ import {
 } from '$lib/api/posts/query';
 import {
 	rawPostSchema,
+	rawTagSchema,
 	type Locale,
 	type LocalizedPost,
+	type LocalizedTag,
 	type RawPost,
 	type PostsResponse
 } from '$lib/api/posts/schema';
 
 const posts = rawPostSchema.array().parse(postsJson);
+const tags = rawTagSchema.array().parse(tagsJson);
+const tagsBySlug = new Map(tags.map((tag) => [tag.slug, tag]));
+
+for (const post of posts) {
+	for (const tag of post.tags) {
+		if (!tagsBySlug.has(tag)) {
+			throw new Error(`Post ${post.id} references unknown tag "${tag}"`);
+		}
+	}
+}
 
 export function getPost(slug: string, locale: Locale = 'en'): LocalizedPost | undefined {
 	const post = posts.find((candidate) => candidate.slug === slug);
 	if (!post) return undefined;
 
-	const { translations, ...shared } = post;
-	return { ...shared, ...translations[locale] };
+	return localizePost(post, locale);
 }
 
-export function listPostTags(): string[] {
-	return [...new Set(posts.flatMap((post) => post.tags))].sort((first, second) =>
-		first.localeCompare(second)
-	);
+export function listPostTags(locale: Locale): LocalizedTag[] {
+	return tags
+		.map((tag) => ({ slug: tag.slug, label: tag.label[locale] }))
+		.sort((first, second) => first.label.localeCompare(second.label, locale));
 }
 
 export function listPosts(query: Partial<PostQuery> = {}): PostsResponse {
@@ -49,11 +61,8 @@ export function listPosts(query: Partial<PostQuery> = {}): PostsResponse {
 	const pagePosts = filteredPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
 
 	return {
-		posts: pagePosts.map((post) => {
-			const { translations, ...shared } = post;
-			return { ...shared, ...translations[locale] };
-		}),
-		tags: listPostTags(),
+		posts: pagePosts.map((post) => localizePost(post, locale)),
+		tags: listPostTags(locale),
 		pagination: {
 			page: safePage,
 			perPage: POSTS_PER_PAGE,
@@ -62,6 +71,19 @@ export function listPosts(query: Partial<PostQuery> = {}): PostsResponse {
 			start: total === 0 ? 0 : startIndex + 1,
 			end: startIndex + pagePosts.length
 		}
+	};
+}
+
+function localizePost(post: RawPost, locale: Locale): LocalizedPost {
+	const { translations, tags: postTags, ...shared } = post;
+
+	return {
+		...shared,
+		...translations[locale],
+		tags: postTags.map((slug) => {
+			const tag = tagsBySlug.get(slug)!;
+			return { slug, label: tag.label[locale] };
+		})
 	};
 }
 

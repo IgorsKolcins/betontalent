@@ -10,6 +10,7 @@
 	import LoadingSpinner from '$lib/components/ui/LoadingSpinner.svelte';
 	import { cn } from '$lib/utils/cn';
 	import { MAX_POST_QUERY_LENGTH, type PostQueryForm } from '$lib/api/posts/query';
+	import type { LocalizedTag } from '$lib/api/posts/schema';
 
 	type BaseProps = {
 		query: PostQueryForm;
@@ -18,7 +19,7 @@
 
 	type PostControlsProps =
 		| (BaseProps & { mode: 'blog' })
-		| (BaseProps & { mode: 'search'; tags: string[]; totalCount: number });
+		| (BaseProps & { mode: 'search'; tags: LocalizedTag[]; totalCount: number });
 
 	let { query, class: className, ...routeProps }: PostControlsProps = $props();
 
@@ -84,8 +85,8 @@
 			<FormField label={m['search.tagLabel']()}>
 				<Select name="tag" value={query.tag} onchange={requestSubmit} disabled={isSubmitting}>
 					<option value="">{m['search.allTags']()}</option>
-					{#each searchProps.tags as tag (tag)}
-						<option value={tag}>{tag}</option>
+					{#each searchProps.tags as tag (tag.slug)}
+						<option value={tag.slug}>{tag.label}</option>
 					{/each}
 				</Select>
 			</FormField>
