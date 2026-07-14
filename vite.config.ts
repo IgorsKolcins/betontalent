@@ -1,9 +1,11 @@
 import { defineConfig } from 'vitest/config';
 import { playwright } from '@vitest/browser-playwright';
 import tailwindcss from '@tailwindcss/vite';
-import adapter from '@sveltejs/adapter-vercel';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
+import { localizedVercelAdapter } from './vercel-adapter';
+
+const locales = ['en', 'de'] as const;
 
 export default defineConfig({
 	plugins: [
@@ -39,7 +41,7 @@ export default defineConfig({
 				runes: ({ filename }) =>
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
-			adapter: adapter()
+			adapter: localizedVercelAdapter(locales)
 		})
 	],
 	ssr: {

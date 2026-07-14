@@ -48,13 +48,26 @@ Use `admin@demo.test`, `editor@demo.test`, or `viewer@demo.test` with password `
 
 ## Decisions and trade-offs
 
-I kept URL state and server data loading as the source of truth. Public content is static or SSR, dashboard data is streamed, and mock JSON is validated once at the server boundary.
+- I kept URL state and server data loading as the source of truth. Public content is static or SSR, dashboard data is streamed, and mock JSON is validated once at the server boundary.
+- The campaign store is intentionally in memory, so edits reset when the server restarts. The static public header also avoids session personalization to keep the homepage cacheable.
 
-The campaign store is intentionally in memory, so edits reset when the server restarts. The static public header also avoids session personalization to keep the homepage cacheable.
+## Challenges encountered
+
+Paraglide's localized URL routing exposed a Vercel-specific integration issue similar to [opral/paraglide-js#32](https://github.com/opral/paraglide-js/issues/32). Locale-prefixed SSR routes such as `/en/blog`, `/en/search`, and `/en/login` worked in development and with `vite preview`, but returned 404 after deployment. Vercel selected a runtime-specific function before SvelteKit's `reroute` hook ran, so localized paths fell through to a catch-all function whose manifest did not contain the requested route.
+
+The app uses a small wrapper around `adapter-vercel` that augments the generated Vercel routing table with locale-prefixed aliases. Each alias targets the same function as its unprefixed route while preserving the localized request URL for Paraglide. This keeps localized SSR and SvelteKit `__data.json` requests working without sacrificing the required Edge and Node runtime split.
+
+## Major package decisions
+
+- **SvelteKit Superforms** — progressive login forms with one client/server validation flow.
+- **Paraglide JS** — type-safe, compiled translations with locale-aware URLs.
+- **Bits UI** — accessible dialog behavior while keeping markup and styling local.
+- **Vercel adapter** — per-route Edge and Node runtimes on one deployment target.
+- **Vitest, Playwright, and Axe** — fast unit/component tests plus real-browser flow and accessibility coverage.
 
 ## Hot take / favorite part
 
-The URL is the best state manager for searchable, shareable tables. My favorite part is the streamed dashboard: the shell remains useful while independent data promises settle.
+Using classes with Svelte runes is a hidden gem. [`ThemeContext`](src/lib/contexts/Theme.svelte.ts) shows how classes work natively with Svelte reactivity, making complex business or behavior logic easy to isolate, reuse, and test. They also integrate naturally with context: reactive context without boilerplate—something React can only dream about.
 
 ## What I would improve with more time
 
