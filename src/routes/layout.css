@@ -167,4 +167,13 @@
 	h1 {
 		@apply text-4xl leading-tight font-bold text-foreground md:text-5xl;
 	}
+
+	html[data-blog-transition]::view-transition-old(root),
+	html[data-blog-transition]::view-transition-new(root) {
+		@apply animate-none;
+	}
+
+	html[data-blog-transition]::view-transition-group(blog-post-cover) {
+		@apply [animation-duration:420ms] [animation-timing-function:cubic-bezier(0.76,0,0.24,1)];
+	}
 }

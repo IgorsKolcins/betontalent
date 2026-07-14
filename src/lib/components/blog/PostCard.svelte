@@ -38,6 +38,7 @@
 >
 	<Card class="h-full pt-0 transition-colors group-hover:border-foreground/30">
 		<div
+			data-blog-cover={post.slug}
 			data-slot="post-cover"
 			class="h-36 border-b border-border"
 			style:background-color={post.coverColor}

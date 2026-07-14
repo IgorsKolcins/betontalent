@@ -61,6 +61,7 @@
 		</Button>
 
 		<div
+			data-blog-cover={data.post.slug}
 			class="mb-8 h-48 rounded-xl border border-border md:h-72"
 			style:background-color={data.post.coverColor}
 			role="img"
