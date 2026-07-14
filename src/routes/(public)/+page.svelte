@@ -1,33 +1,17 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
-	import { BookOpenText, Search } from '@lucide/svelte';
-	import Button from '$lib/components/ui/Button.svelte';
-	import Container from '$lib/components/ui/Container.svelte';
+	import FeaturesSection from '$lib/components/home/FeaturesSection.svelte';
+	import FinalCtaSection from '$lib/components/home/FinalCtaSection.svelte';
+	import HeroSection from '$lib/components/home/HeroSection.svelte';
+	import PricingSection from '$lib/components/home/PricingSection.svelte';
+	import SocialProofSection from '$lib/components/home/SocialProofSection.svelte';
 	import { m } from '$lib/paraglide/messages.js';
-	import { localizeHref } from '$lib/paraglide/runtime.js';
 
 	let { data } = $props();
-
-	const heroAvifSrcset =
-		'/images/hero/hero-talent-640.avif 640w, /images/hero/hero-talent-960.avif 960w, /images/hero/hero-talent-1280.avif 1280w, /images/hero/hero-talent-1774.avif 1774w';
-	const heroWebpSrcset =
-		'/images/hero/hero-talent-640.webp 640w, /images/hero/hero-talent-960.webp 960w, /images/hero/hero-talent-1280.webp 1280w, /images/hero/hero-talent-1774.webp 1774w';
-	const heroSizes =
-		'(min-width: 1200px) 1152px, (min-width: 768px) calc(100vw - 48px), calc(100vw - 40px)';
 </script>
 
 <svelte:head>
 	<title>{m['app.title']()}</title>
 	<meta name="description" content={m['app.description']()} />
-	<link
-		rel="preload"
-		as="image"
-		type="image/avif"
-		href="/images/hero/hero-talent-1280.avif"
-		imagesrcset={heroAvifSrcset}
-		imagesizes={heroSizes}
-		fetchpriority="high"
-	/>
 	<link rel="canonical" href={data.seo.canonical} />
 	{#each data.seo.alternates as alternate (alternate.hreflang)}
 		<link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />
@@ -35,69 +19,10 @@
 	<link rel="alternate" hreflang="x-default" href={data.seo.xDefault} />
 </svelte:head>
 
-<main class="min-h-screen py-4 md:py-6">
-	<Container>
-		<section
-			class="relative isolate flex min-h-[36rem] items-end overflow-hidden rounded-xl border border-white/10 bg-slate-950 shadow-2xl shadow-slate-950/20 md:min-h-[34rem] md:items-center lg:aspect-2/1 lg:min-h-0"
-			aria-labelledby="home-title"
-		>
-			<img
-				src="/images/hero/hero-talent-lqip.webp"
-				alt=""
-				width="32"
-				height="16"
-				aria-hidden="true"
-				class="absolute inset-0 -z-20 size-full scale-110 object-cover object-[69%_center] blur-2xl"
-			/>
-			<picture class="absolute inset-0 -z-10">
-				<source type="image/avif" srcset={heroAvifSrcset} sizes={heroSizes} />
-				<source type="image/webp" srcset={heroWebpSrcset} sizes={heroSizes} />
-				<img
-					src="/images/hero/hero-talent-1280.webp"
-					alt=""
-					width="1774"
-					height="887"
-					loading="eager"
-					fetchpriority="high"
-					decoding="async"
-					class="size-full object-cover object-[69%_center]"
-				/>
-			</picture>
-
-			<div class="max-w-xl px-6 py-8 text-white sm:px-10 sm:py-12 md:w-[58%] md:px-12 lg:px-16">
-				<h1
-					id="home-title"
-					class="mt-4 text-[clamp(2.75rem,7vw,5.25rem)] leading-[0.7] tracking-[-0.04em] text-white"
-				>
-					{m['home.assignment.title']()}
-				</h1>
-				<p class="mt-5 max-w-md text-base leading-7 text-white/75 md:text-lg">
-					{m['home.assignment.description']()}
-				</p>
-				<div class="mt-8 flex flex-wrap gap-3">
-					<Button
-						href={resolve(localizeHref('/blog') as '/')}
-						class="group h-11 bg-white px-5 text-slate-950 hover:bg-white/90 focus-visible:outline-white"
-					>
-						<BookOpenText
-							aria-hidden="true"
-							class="size-4 transition-transform duration-200 group-hover:-translate-y-0.5 motion-reduce:transform-none"
-						/>
-						{m['nav.blog']()}
-					</Button>
-					<Button
-						href={resolve(localizeHref('/search') as '/')}
-						variant="secondary"
-						class="group h-11 border-white/35 bg-white/10 px-5 text-white shadow-sm backdrop-blur-sm hover:bg-white/20 hover:text-white focus-visible:outline-white"
-					>
-						<Search
-							aria-hidden="true"
-							class="size-4 transition-transform duration-200 group-hover:scale-110 group-hover:-rotate-6 motion-reduce:transform-none"
-						/>
-						{m['nav.search']()}
-					</Button>
-				</div>
-			</div>
-		</section>
-	</Container>
+<main class="min-h-screen pt-4 md:pt-6">
+	<HeroSection />
+	<FeaturesSection features={data.homepage.features} />
+	<SocialProofSection socialProof={data.homepage.socialProof} />
+	<PricingSection pricing={data.homepage.pricing} />
+	<FinalCtaSection />
 </main>

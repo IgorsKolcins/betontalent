@@ -1,50 +1,61 @@
-# sv
+# Gaming Dashboard
 
-## Demo authentication
+A SvelteKit dashboard built for the senior frontend take-home assessment.
 
-Copy `.env.example` to `.env` and replace `SESSION_SECRET` with any non-empty random string before using demo authentication. Demo account credentials remain in the supplied mock-data README.
+## Requirements
 
-## Mock data boundaries
+- Node.js 22.13+
+- npm 10+
 
-The supplied JSON is statically imported on the server so malformed fixtures fail during startup rather than reaching page components. Executable Zod contracts validate posts, campaigns, users, and the tag taxonomy while providing the inferred TypeScript types. Tag slugs stay stable in filter URLs; labels are localized from `mocks/tags.json` at the API boundary.
+## Installation
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
-
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```sh
-# create a new project
-npx sv create my-app
-```
-
-To recreate this project with the same configuration:
-
-```sh
-# recreate this project
-npx sv@0.16.2 create --template minimal --types ts --add prettier eslint playwright tailwindcss="plugins:typography,forms" sveltekit-adapter="adapter:vercel" vitest="usages:unit,component" --install npm app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
+```bash
+npm install
+cp .env.example .env
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+Open `http://localhost:5173`.
 
-To create a production version of your app:
+## Tests
 
-```sh
-npm run build
+Run the unit and end-to-end test suites:
+
+```bash
+npm test
 ```
 
-You can preview the production build with `npm run preview`.
+## Demo login
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+Use `admin@demo.test`, `editor@demo.test`, or `viewer@demo.test` with password `demo1234`.
+
+## What I implemented
+
+- Localized public routes for the homepage, blog, article, search, and custom error page, with URL-synced search, filtering, sorting, and pagination.
+- Signed cookie authentication, shared client/server Zod validation, protected dashboard routes, and role-based campaign editing.
+- A streamed dashboard table with server-side queries, loading/empty/error states, and optimistic status updates with rollback.
+- EN/DE routing, token-based light/dark themes, reusable UI primitives, validated mock-data contracts, and locale-aware formatting.
+- Deliberate SSG, SSR, streamed SSR, Edge, and Node runtime boundaries.
+- Vitest component/business-logic coverage plus Playwright anonymous and authenticated flows, Axe checks, and a visual snapshot.
+
+## What I did not implement
+
+- The homepage feature, pricing, and social-proof sections.
+- Lighthouse and bundle-size budgets, CI, pre-commit hooks, RUM, and client error reporting.
+- Complete SEO coverage: social metadata, homepage JSON-LD, article sitemap entries, and generated OG images.
+- A fully hand-built complex accessible composite; the dialog/drawer uses Bits UI primitives.
+- The optional offline shell, partial prerendering, and SSR feature flag, or a live deployment.
+
+## Decisions and trade-offs
+
+I kept URL state and server data loading as the source of truth. Public content is static or SSR, dashboard data is streamed, and mock JSON is validated once at the server boundary.
+
+The campaign store is intentionally in memory, so edits reset when the server restarts. The static public header also avoids session personalization to keep the homepage cacheable.
+
+## Hot take / favorite part
+
+The URL is the best state manager for searchable, shareable tables. My favorite part is the streamed dashboard: the shell remains useful while independent data promises settle.
+
+## What I would improve with more time
+
+I would close the compliance gaps first: performance CI, observability, complete SEO, the remaining homepage sections, and a custom accessible composite. After that, I would replace in-memory mutations with persistent storage and add broader failure-path coverage.

@@ -1,0 +1,37 @@
+{
+	"features": ["talent", "campaigns", "insights", "optimization"],
+	"pricing": {
+		"currency": "EUR",
+		"plans": [
+			{
+				"id": "starter",
+				"monthlyPrice": 29,
+				"highlighted": false,
+				"features": ["threeCampaigns", "basicReporting", "oneSeat"]
+			},
+			{
+				"id": "growth",
+				"monthlyPrice": 99,
+				"highlighted": true,
+				"features": ["unlimitedCampaigns", "advancedReporting", "teamCollaboration"]
+			},
+			{
+				"id": "enterprise",
+				"monthlyPrice": null,
+				"highlighted": false,
+				"features": ["multipleWorkspaces", "customPermissions", "dedicatedSupport"]
+			}
+		]
+	},
+	"socialProof": {
+		"stats": [
+			{ "id": "campaigns", "value": 2400 },
+			{ "id": "partnerships", "value": 450 },
+			{ "id": "timeSaved", "value": 32 }
+		],
+		"testimonial": {
+			"id": "northstar",
+			"rating": 5
+		}
+	}
+}

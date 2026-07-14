@@ -1,7 +1,16 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
-	import { BookOpen, LayoutDashboard, LogIn, Menu, Moon, Search, Sun } from '@lucide/svelte';
+	import {
+		BookOpen,
+		CircleDollarSign,
+		LayoutDashboard,
+		LogIn,
+		Menu,
+		Moon,
+		Search,
+		Sun
+	} from '@lucide/svelte';
 	import { onMount } from 'svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Container from '$lib/components/ui/Container.svelte';
@@ -13,6 +22,7 @@
 
 	const theme = getThemeContext();
 	let isAuthenticated = $state(false);
+	const pricingHref = `${resolve(localizeHref('/') as '/')}#pricing`;
 	const activeLocale = $derived(getLocale());
 	const nextLocale = $derived((activeLocale === 'en' ? 'de' : 'en') satisfies Locale);
 	const accountHref = $derived(
@@ -84,6 +94,9 @@
 			{m['brand.name']()}
 		</a>
 		<nav class="hidden items-center justify-center gap-1 md:flex" aria-label={m['nav.primary']()}>
+			<Button href={pricingHref} variant="ghost">
+				{m['nav.pricing']()}
+			</Button>
 			<Button href={resolve(localizeHref('/blog') as '/')} variant="ghost">
 				{m['nav.blog']()}
 			</Button>
@@ -124,6 +137,15 @@
 						class="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-3"
 						aria-label={m['nav.primary']()}
 					>
+						<Button
+							href={pricingHref}
+							variant="ghost"
+							onclick={close}
+							class="h-10 w-full justify-start gap-3"
+						>
+							<CircleDollarSign aria-hidden="true" class="size-4" />
+							{m['nav.pricing']()}
+						</Button>
 						<Button
 							href={resolve(localizeHref('/blog') as '/')}
 							variant="ghost"
