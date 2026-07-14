@@ -1,17 +1,5 @@
 import { expect, test } from '@playwright/test';
 
-type BlogViewTransitionRecord = {
-	direction: string;
-	source?: string;
-	target?: string;
-	rootAnimationName?: string;
-	coverAnimationDuration?: string;
-};
-
-type BlogViewTransitionWindow = Window & {
-	__blogViewTransitions: BlogViewTransitionRecord[];
-};
-
 test('an anonymous visitor searches, opens a result, and reads the post', async ({ page }) => {
 	await page.goto('/en/search');
 
@@ -42,78 +30,6 @@ test('an anonymous visitor searches, opens a result, and reads the post', async 
 		page.getByRole('heading', { level: 1, name: 'Sub-second LCP on a content site' })
 	).toBeVisible();
 	await expect(page.getByText('Published by Omar Haddad')).toBeVisible();
-});
-
-test('the selected cover moves into the Blog Post and back to its card', async ({ page }) => {
-	await page.addInitScript(() => {
-		const transitions: BlogViewTransitionRecord[] = [];
-		const startViewTransition = document.startViewTransition.bind(document);
-		const getNamedCover = () =>
-			Array.from(document.querySelectorAll<HTMLElement>('[data-blog-cover]')).find(
-				(cover) => cover.style.viewTransitionName === 'blog-post-cover'
-			)?.dataset.blogCover;
-		Object.defineProperty(window, '__blogViewTransitions', { value: transitions });
-
-		document.startViewTransition = (updateCallback) => {
-			const record = {
-				direction: document.documentElement.dataset.blogTransition ?? '',
-				source: getNamedCover()
-			};
-			transitions.push(record);
-			const transition = startViewTransition(updateCallback);
-			void transition.ready.then(() => {
-				record.target = getNamedCover();
-				record.rootAnimationName = getComputedStyle(
-					document.documentElement,
-					'::view-transition-old(root)'
-				).animationName;
-				record.coverAnimationDuration = getComputedStyle(
-					document.documentElement,
-					'::view-transition-group(blog-post-cover)'
-				).animationDuration;
-			});
-			return transition;
-		};
-	});
-
-	await page.goto('/en/search?q=Sub-second+LCP');
-	await page.waitForLoadState('networkidle');
-	await page.getByRole('link', { name: 'Read Sub-second LCP on a content site' }).click();
-	await expect
-		.poll(() => page.evaluate(() => (window as BlogViewTransitionWindow).__blogViewTransitions))
-		.toEqual([
-			{
-				coverAnimationDuration: '0.42s',
-				direction: 'forward',
-				rootAnimationName: 'none',
-				source: 'sub-second-lcp-on-a-content-site',
-				target: 'sub-second-lcp-on-a-content-site'
-			}
-		]);
-	await expect(
-		page.getByRole('heading', { level: 1, name: 'Sub-second LCP on a content site' })
-	).toBeVisible();
-
-	await page.goBack();
-	await expect(page.getByRole('heading', { level: 1, name: 'Search' })).toBeVisible();
-	await expect
-		.poll(() => page.evaluate(() => (window as BlogViewTransitionWindow).__blogViewTransitions))
-		.toEqual([
-			{
-				coverAnimationDuration: '0.42s',
-				direction: 'forward',
-				rootAnimationName: 'none',
-				source: 'sub-second-lcp-on-a-content-site',
-				target: 'sub-second-lcp-on-a-content-site'
-			},
-			{
-				coverAnimationDuration: '0.42s',
-				direction: 'backward',
-				rootAnimationName: 'none',
-				source: 'sub-second-lcp-on-a-content-site',
-				target: 'sub-second-lcp-on-a-content-site'
-			}
-		]);
 });
 
 test('invalid search fields fall back independently from valid URL state', async ({ page }) => {

@@ -12,6 +12,13 @@ test('an authenticated editor sees an accessible dashboard and campaign edits st
 	await expect(page).toHaveURL(/\/en\/dashboard$/);
 	await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
 
+	await page.goto('/en');
+	const dashboardLink = page.getByRole('link', { name: 'Dashboard', exact: true });
+	await expect(dashboardLink).toBeVisible();
+	await expect(page.getByRole('link', { name: 'Sign in', exact: true })).toHaveCount(0);
+	await dashboardLink.click();
+	await expect(page).toHaveURL(/\/en\/dashboard$/);
+
 	const accessibility = await new AxeBuilder({ page }).analyze();
 	const seriousOrCritical = accessibility.violations.filter(
 		(violation) => violation.impact === 'serious' || violation.impact === 'critical'

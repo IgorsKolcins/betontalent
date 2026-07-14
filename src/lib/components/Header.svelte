@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
-	import { BookOpen, LogIn, Menu, Moon, Search, Sun } from '@lucide/svelte';
+	import { BookOpen, LayoutDashboard, LogIn, Menu, Moon, Search, Sun } from '@lucide/svelte';
+	import { onMount } from 'svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Container from '$lib/components/ui/Container.svelte';
 	import Drawer from '$lib/components/ui/Drawer.svelte';
@@ -11,13 +12,39 @@
 	import { cn } from '$lib/utils/cn';
 
 	const theme = getThemeContext();
+	let isAuthenticated = $state(false);
 	const activeLocale = $derived(getLocale());
 	const nextLocale = $derived((activeLocale === 'en' ? 'de' : 'en') satisfies Locale);
+	const accountHref = $derived(
+		isAuthenticated
+			? resolve(localizeHref('/dashboard') as '/dashboard')
+			: resolve(localizeHref('/login') as '/login')
+	);
+	const accountLabel = $derived(isAuthenticated ? m['nav.dashboard']() : m['nav.login']());
 	const localeHref = $derived.by(() => {
 		const routePath = deLocalizeHref(page.url.pathname);
 		const currentUrl = routePath === '/' ? routePath : `${routePath}${page.url.search}`;
 
 		return resolve(localizeHref(currentUrl, { locale: nextLocale }) as '/');
+	});
+
+	onMount(() => {
+		const controller = new AbortController();
+
+		void fetch(resolve('/api/auth/session'), { signal: controller.signal })
+			.then(async (response) => {
+				if (!response.ok) return;
+
+				const result = (await response.json()) as { isAuthenticated?: unknown };
+				if (typeof result.isAuthenticated === 'boolean') {
+					isAuthenticated = result.isAuthenticated;
+				}
+			})
+			.catch(() => {
+				// The anonymous CTA is the safe progressive-enhancement fallback.
+			});
+
+		return () => controller.abort();
 	});
 </script>
 
@@ -65,8 +92,8 @@
 			</Button>
 		</nav>
 		<div class="hidden items-center justify-end gap-2 md:flex">
-			<Button href={resolve(localizeHref('/login') as '/login')} class="h-9">
-				{m['nav.login']()}
+			<Button href={accountHref} class="h-9">
+				{accountLabel}
 			</Button>
 			{@render appearanceControls(undefined, false)}
 		</div>
@@ -116,13 +143,17 @@
 							{m['nav.search']()}
 						</Button>
 						<Button
-							href={resolve(localizeHref('/login') as '/login')}
+							href={accountHref}
 							variant="ghost"
 							onclick={close}
 							class="h-10 w-full justify-start gap-3"
 						>
-							<LogIn aria-hidden="true" class="size-4" />
-							{m['nav.login']()}
+							{#if isAuthenticated}
+								<LayoutDashboard aria-hidden="true" class="size-4" />
+							{:else}
+								<LogIn aria-hidden="true" class="size-4" />
+							{/if}
+							{accountLabel}
 						</Button>
 					</nav>
 

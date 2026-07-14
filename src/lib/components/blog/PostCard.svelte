@@ -40,7 +40,7 @@
 		<div
 			data-blog-cover={post.slug}
 			data-slot="post-cover"
-			class="h-36 border-b border-border"
+			class="h-36 rounded-t-lg border-b border-border"
 			style:background-color={post.coverColor}
 			aria-label={m['blog.coverLabel']({ title: post.title })}
 			role="img"
