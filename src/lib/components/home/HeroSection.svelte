@@ -28,7 +28,7 @@
 
 <Container>
 	<section
-		class="relative isolate flex min-h-[36rem] items-end overflow-hidden rounded-xl border border-white/10 bg-slate-950 shadow-2xl shadow-slate-950/20 md:min-h-[34rem] md:items-center lg:aspect-2/1 lg:min-h-0"
+		class="relative isolate flex min-h-144 items-end overflow-hidden rounded-xl border border-white/10 bg-slate-950 shadow-2xl shadow-slate-950/20 md:min-h-136 md:items-center lg:aspect-2/1 lg:min-h-0"
 		aria-labelledby="home-title"
 	>
 		<picture class="absolute inset-0 -z-10">

@@ -1,6 +1,8 @@
-# Gaming Dashboard
+# Bet On Talen frontend take-home assessment
 
 A SvelteKit dashboard built for the senior frontend take-home assessment.
+
+**Author**: Igors Kolčins
 
 ## Requirements
 
@@ -28,6 +30,10 @@ npm test
 ## Demo login
 
 Use `admin@demo.test`, `editor@demo.test`, or `viewer@demo.test` with password `demo1234`.
+
+## Time spent
+
+~12 hours
 
 ## What I implemented
 
