@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { twMerge } from 'tailwind-merge';
 	import type { Snippet } from 'svelte';
+	import { cn } from '$lib/utils/cn';
 
 	let {
 		children,
@@ -13,7 +13,7 @@
 
 <main
 	data-slot="sidebar-inset"
-	class={twMerge('relative flex min-h-svh w-full min-w-0 flex-1 flex-col bg-background', className)}
+	class={cn('relative flex min-h-svh w-full min-w-0 flex-1 flex-col bg-background', className)}
 >
 	{@render children()}
 </main>

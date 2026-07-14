@@ -1,12 +1,21 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import { untrack } from 'svelte';
+	import { superForm, type SuperValidated } from 'sveltekit-superforms';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { m } from '$lib/paraglide/messages.js';
 	import { localizeHref } from '$lib/paraglide/runtime.js';
 	import FormField from '$lib/components/ui/FormField.svelte';
 	import SearchInput from '$lib/components/ui/SearchInput.svelte';
 	import Select from '$lib/components/ui/Select.svelte';
-	import { MAX_POST_QUERY_LENGTH, type PostQueryForm } from '$lib/api/posts/query';
+	import DelayedLoading from '$lib/components/ui/DelayedLoading.svelte';
+	import LoadingSpinner from '$lib/components/ui/LoadingSpinner.svelte';
+	import { cn } from '$lib/utils/cn';
+	import {
+		MAX_POST_QUERY_LENGTH,
+		postQueryFormSchema,
+		type PostQueryForm
+	} from '$lib/api/posts/query';
 
 	type BaseProps = {
 		formData: SuperValidated<PostQueryForm>;
@@ -19,12 +28,33 @@
 
 	let { formData, class: className, ...routeProps }: PostControlsProps = $props();
 
-	const query = $derived(formData.data);
-	const queryError = $derived(formData.errors.q?.[0]);
+	const { errors, form, validateForm } = superForm(
+		untrack(() => formData),
+		{
+			validators: zod4Client(postQueryFormSchema),
+			validationMethod: 'submit-only',
+			resetForm: false
+		}
+	);
+	let isSubmitting = $state(false);
+	const queryError = $derived($errors.q?.[0]);
 	const searchProps = $derived(routeProps.mode === 'search' ? routeProps : undefined);
 
-	function submitForm(event: Event & { currentTarget: HTMLSelectElement }) {
+	function requestSubmit(event: Event & { currentTarget: HTMLSelectElement }) {
 		event.currentTarget.form?.requestSubmit();
+	}
+
+	async function submitForm(event: SubmitEvent & { currentTarget: HTMLFormElement }) {
+		event.preventDefault();
+		const formElement = event.currentTarget;
+		isSubmitting = true;
+
+		const validation = await validateForm({ update: true, focusOnError: true });
+		if (validation.valid) {
+			formElement.submit();
+		} else {
+			isSubmitting = false;
+		}
 	}
 </script>
 
@@ -37,13 +67,32 @@
 	<option value="readingTimeMinutes-desc">{m['filters.sort.longest']()}</option>
 {/snippet}
 
-<form method="GET" action={resolve(localizeHref(`/${routeProps.mode}`) as '/')} class={className}>
+<form
+	method="GET"
+	action={resolve(localizeHref(`/${routeProps.mode}`) as '/')}
+	onsubmit={submitForm}
+	class={className}
+>
 	{#snippet sortControl(className = '')}
-		<label class={['flex items-center gap-3 text-sm font-medium text-foreground', className]}>
+		<label class={cn('flex items-center gap-3 text-sm font-medium text-foreground', className)}>
 			<span>{m['filters.sortLabel']()}</span>
-			<Select class="w-44" name="sort" value={query.sort} onchange={submitForm}>
+			<Select
+				class="w-44"
+				name="sort"
+				bind:value={$form.sort}
+				onchange={requestSubmit}
+				disabled={isSubmitting}
+			>
 				{@render sortOptions()}
 			</Select>
+			{#if isSubmitting}
+				<DelayedLoading>
+					<span class="inline-flex items-center gap-2 text-xs text-muted-foreground" role="status">
+						<LoadingSpinner />
+						<span class="sr-only">{m['common.loading']()}</span>
+					</span>
+				</DelayedLoading>
+			{/if}
 		</label>
 	{/snippet}
 
@@ -58,16 +107,17 @@
 				<SearchInput
 					name="q"
 					placeholder={m['search.placeholder']()}
-					value={query.q}
+					bind:value={$form.q}
 					maxlength={MAX_POST_QUERY_LENGTH}
 					aria-invalid={queryError ? 'true' : undefined}
 					clearLabel={m['search.clearLabel']()}
 					submitLabel={m['search.submitLabel']()}
+					loading={isSubmitting}
 				/>
 			</FormField>
 
 			<FormField label={m['search.tagLabel']()}>
-				<Select name="tag" value={query.tag} onchange={submitForm}>
+				<Select name="tag" bind:value={$form.tag} onchange={requestSubmit} disabled={isSubmitting}>
 					<option value="">{m['search.allTags']()}</option>
 					{#each searchProps.tags as tag (tag)}
 						<option value={tag}>{tag}</option>
@@ -87,8 +137,8 @@
 
 		<div class="flex flex-wrap items-center justify-between gap-4">
 			<p class="text-sm font-medium text-muted-foreground">
-				{#if query.q}
-					{m['search.results']({ count: searchProps.totalCount, query: query.q })}
+				{#if $form.q}
+					{m['search.results']({ count: searchProps.totalCount, query: $form.q })}
 				{:else}
 					{m['search.resultsCount']({ count: searchProps.totalCount })}
 				{/if}

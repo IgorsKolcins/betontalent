@@ -4,6 +4,7 @@ import {
 	CAMPAIGNS_PER_PAGE,
 	CAMPAIGN_CHANNELS,
 	CAMPAIGN_STATUSES,
+	type CampaignStatus,
 	splitCampaignSort,
 	type CampaignQuery,
 	type CampaignSortField
@@ -48,7 +49,7 @@ export type CampaignSummary = {
 	aggregateCtr: number;
 };
 
-export function getCampaignSummary(): CampaignSummary {
+export async function getCampaignSummary(): Promise<CampaignSummary> {
 	const totals = campaigns.reduce(
 		(summary, campaign) => ({
 			activeCount: summary.activeCount + Number(campaign.status === 'active'),
@@ -67,7 +68,7 @@ export function getCampaignSummary(): CampaignSummary {
 	};
 }
 
-export function getCampaignPage(query: CampaignQuery, locale: string): CampaignPage {
+export async function getCampaignPage(query: CampaignQuery, locale: string): Promise<CampaignPage> {
 	const normalizedQuery = query.q.toLocaleLowerCase(locale);
 	const filteredCampaigns = campaigns.filter(
 		(campaign) =>
@@ -97,6 +98,15 @@ export function getCampaignPage(query: CampaignQuery, locale: string): CampaignP
 			totalCount: campaigns.length
 		}
 	};
+}
+
+export function updateCampaignStatus(id: string, status: CampaignStatus): Campaign | null {
+	const campaign = campaigns.find((candidate) => candidate.id === id);
+	if (!campaign) return null;
+
+	campaign.status = status;
+	campaign.updatedAt = new Date().toISOString();
+	return campaign;
 }
 
 function compareCampaigns(

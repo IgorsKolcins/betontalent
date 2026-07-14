@@ -12,9 +12,14 @@
 	import Avatar from '$lib/components/ui/Avatar.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
+	import DelayedLoading from '$lib/components/ui/DelayedLoading.svelte';
+	import LoadingSpinner from '$lib/components/ui/LoadingSpinner.svelte';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/Card';
+	import type { CampaignSummary } from '$lib/server/campaigns';
+	import type { PageData } from './$types';
 
-	let { data } = $props();
+	let { data }: { data: PageData } = $props();
+	let isLoggingOut = $state(false);
 
 	const locale = $derived(getLocale());
 	const numberFormatter = $derived(new Intl.NumberFormat(locale));
@@ -33,25 +38,37 @@
 	const metrics = $derived([
 		{
 			label: m['dashboard.metrics.total'](),
-			value: numberFormatter.format(data.summary.totalCount),
+			key: 'totalCount' as const,
 			icon: Megaphone
 		},
 		{
 			label: m['dashboard.metrics.active'](),
-			value: numberFormatter.format(data.summary.activeCount),
+			key: 'activeCount' as const,
 			icon: CircleCheckBig
 		},
 		{
 			label: m['dashboard.metrics.budget'](),
-			value: currencyFormatter.format(data.summary.totalBudget),
+			key: 'totalBudget' as const,
 			icon: Wallet
 		},
 		{
 			label: m['dashboard.metrics.ctr'](),
-			value: percentFormatter.format(data.summary.aggregateCtr),
+			key: 'aggregateCtr' as const,
 			icon: ChartNoAxesCombined
 		}
 	]);
+
+	function formatMetric(key: keyof CampaignSummary, summary: CampaignSummary): string {
+		switch (key) {
+			case 'totalCount':
+			case 'activeCount':
+				return numberFormatter.format(summary[key]);
+			case 'totalBudget':
+				return currencyFormatter.format(summary[key]);
+			case 'aggregateCtr':
+				return percentFormatter.format(summary[key]);
+		}
+	}
 </script>
 
 <svelte:head>
@@ -87,9 +104,15 @@
 					</div>
 				</div>
 
-				<form method="POST" action={logoutAction} class="sm:ml-auto">
-					<Button type="submit" variant="ghost">
-						{m['nav.logout']()}
+				<form
+					method="POST"
+					action={logoutAction}
+					class="sm:ml-auto"
+					onsubmit={() => (isLoggingOut = true)}
+				>
+					<Button type="submit" variant="ghost" disabled={isLoggingOut}>
+						{#if isLoggingOut}<DelayedLoading><LoadingSpinner /></DelayedLoading>{/if}
+						{isLoggingOut ? m['logout.submitting']() : m['nav.logout']()}
 					</Button>
 				</form>
 			</CardContent>
@@ -108,7 +131,19 @@
 						<CardTitle class="text-sm text-muted-foreground">{metric.label}</CardTitle>
 					</CardHeader>
 					<CardContent>
-						<p class="text-2xl font-bold tracking-tight text-foreground">{metric.value}</p>
+						{#await data.summary}
+							<div
+								class="h-7 w-24 animate-pulse rounded-md bg-muted motion-reduce:animate-none"
+								aria-hidden="true"
+							></div>
+							<span class="sr-only">{m['common.loading']()}</span>
+						{:then summary}
+							<p class="text-2xl font-bold tracking-tight text-foreground">
+								{formatMetric(metric.key, summary)}
+							</p>
+						{:catch}
+							<p class="text-sm text-destructive" role="alert">{m['common.error']()}</p>
+						{/await}
 					</CardContent>
 				</Card>
 			{/each}
@@ -121,7 +156,7 @@
 	>
 		<span>
 			<span class="block text-xl font-bold md:text-2xl">{m['dashboard.cta.title']()}</span>
-			<span class="mt-1 block text-sm text-brand-foreground/80 md:text-base">
+			<span class="mt-1 block text-sm text-brand-foreground md:text-base">
 				{m['dashboard.cta.description']()}
 			</span>
 		</span>

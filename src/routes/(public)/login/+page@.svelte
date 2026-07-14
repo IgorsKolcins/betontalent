@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { createLoginSchema } from '$lib/auth/login-schema';
 	import { resolve } from '$app/paths';
-	import { ChartNoAxesCombined, Sparkles } from '@lucide/svelte';
+	import { ArrowLeft, ChartNoAxesCombined, Sparkles } from '@lucide/svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import FormField from '$lib/components/ui/FormField.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
+	import DelayedLoading from '$lib/components/ui/DelayedLoading.svelte';
+	import LoadingSpinner from '$lib/components/ui/LoadingSpinner.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import { localizeHref } from '$lib/paraglide/runtime.js';
 	import { untrack } from 'svelte';
@@ -119,9 +121,19 @@
 				</FormField>
 
 				<Button type="submit" class="mt-2 h-12 w-full" disabled={$submitting}>
+					{#if $submitting}<DelayedLoading><LoadingSpinner /></DelayedLoading>{/if}
 					{$submitting ? m['login.submitting']() : m['login.submit']()}
 				</Button>
 			</form>
+
+			<Button
+				href={resolve(localizeHref('/') as '/')}
+				variant="ghost"
+				class="mx-auto mt-5 flex w-fit"
+			>
+				<ArrowLeft aria-hidden="true" class="size-4" />
+				{m['login.backHome']()}
+			</Button>
 		</div>
 	</section>
 

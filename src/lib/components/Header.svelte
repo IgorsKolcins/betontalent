@@ -8,6 +8,7 @@
 	import { getThemeContext } from '$lib/contexts/Theme.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import { deLocalizeHref, getLocale, localizeHref, type Locale } from '$lib/paraglide/runtime.js';
+	import { cn } from '$lib/utils/cn';
 
 	const theme = getThemeContext();
 	const activeLocale = $derived(getLocale());
@@ -27,13 +28,15 @@
 		variant="secondary"
 		data-sveltekit-reload
 		onclick={close}
-		class={fill ? 'h-9 flex-1' : 'h-9'}
+		class={cn('h-9', { 'flex-1': fill })}
 		aria-label={m['language.toggle']({ locale: nextLocale.toUpperCase() })}
 		title={m['language.toggle']({ locale: nextLocale.toUpperCase() })}
 	>
-		<span class={activeLocale === 'en' ? 'text-foreground' : 'text-muted-foreground'}>EN</span>
+		<span class={cn('text-muted-foreground', { 'text-foreground': activeLocale === 'en' })}>EN</span
+		>
 		<span class="text-muted-foreground">/</span>
-		<span class={activeLocale === 'de' ? 'text-foreground' : 'text-muted-foreground'}>DE</span>
+		<span class={cn('text-muted-foreground', { 'text-foreground': activeLocale === 'de' })}>DE</span
+		>
 	</Button>
 	<Button
 		variant="icon"

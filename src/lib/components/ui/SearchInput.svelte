@@ -2,7 +2,9 @@
 	import { Search, X } from '@lucide/svelte';
 	import type { HTMLButtonAttributes, HTMLInputAttributes } from 'svelte/elements';
 	import Button from './Button.svelte';
+	import DelayedLoading from './DelayedLoading.svelte';
 	import Input from './Input.svelte';
+	import LoadingSpinner from './LoadingSpinner.svelte';
 
 	type SearchInputProps = Omit<HTMLInputAttributes, 'type' | 'value'> & {
 		value?: string;
@@ -13,6 +15,7 @@
 		submitType?: HTMLButtonAttributes['type'];
 		showClear?: boolean;
 		showSubmit?: boolean;
+		loading?: boolean;
 	};
 
 	let {
@@ -24,6 +27,7 @@
 		submitType = 'submit',
 		showClear = true,
 		showSubmit = true,
+		loading = false,
 		...inputAttributes
 	}: SearchInputProps = $props();
 
@@ -65,8 +69,13 @@
 				aria-label={submitLabel}
 				title={submitLabel}
 				onclick={onSubmitClick}
+				disabled={loading}
 			>
-				<Search aria-hidden="true" class="size-4" />
+				{#if loading}
+					<DelayedLoading><LoadingSpinner /></DelayedLoading>
+				{:else}
+					<Search aria-hidden="true" class="size-4" />
+				{/if}
 			</Button>
 		{/if}
 	{/snippet}

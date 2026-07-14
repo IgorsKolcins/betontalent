@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { X } from '@lucide/svelte';
 	import type { Snippet } from 'svelte';
+	import { cn } from '$lib/utils/cn';
 	import Button from './Button.svelte';
 	import {
 		Dialog,
@@ -49,13 +50,13 @@
 		<DialogOverlay data-slot="drawer-overlay" />
 		<DialogContent
 			data-slot="drawer-content"
-			class={[
+			class={cn(
 				'group/drawer-content inset-y-0 right-0 left-auto h-dvh max-h-none w-3/4 max-w-96',
 				'translate-x-0 translate-y-0 gap-0 rounded-none border-0 border-l border-border p-0',
 				'data-[state=closed]:animate-drawer-out data-[state=open]:animate-drawer-in',
 				'motion-reduce:data-[state=closed]:animate-none motion-reduce:data-[state=open]:animate-none',
 				className
-			]}
+			)}
 		>
 			<DialogTitle class="sr-only">{title}</DialogTitle>
 			<DialogClose>

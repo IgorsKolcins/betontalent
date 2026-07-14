@@ -33,7 +33,8 @@ export type CampaignSort = `${CampaignSortField}-${CampaignSortDirection}`;
 const campaignSortOptions = CAMPAIGN_SORT_FIELDS.flatMap((field) =>
 	CAMPAIGN_SORT_DIRECTIONS.map((direction) => `${field}-${direction}` as CampaignSort)
 );
-const campaignStatusFilterSchema = z.enum(CAMPAIGN_STATUSES).or(z.literal(''));
+export const campaignStatusSchema = z.enum(CAMPAIGN_STATUSES);
+const campaignStatusFilterSchema = campaignStatusSchema.or(z.literal(''));
 const campaignChannelFilterSchema = z.enum(CAMPAIGN_CHANNELS).or(z.literal(''));
 const campaignSortSchema = z.enum(campaignSortOptions);
 const campaignPageSchema = z.coerce.number().int().min(1);
