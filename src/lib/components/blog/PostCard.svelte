@@ -51,8 +51,8 @@
 					<Badge variant="outline">{tag}</Badge>
 				{/each}
 			</div>
-			<CardTitle class="mb-2">{post.title}</CardTitle>
-			<CardDescription>{post.excerpt}</CardDescription>
+			<CardTitle class="mb-2 line-clamp-2 break-words">{post.title}</CardTitle>
+			<CardDescription class="line-clamp-2 break-words">{post.excerpt}</CardDescription>
 		</CardHeader>
 		<CardContent class="mt-auto">
 			<div class="flex items-center gap-2">
@@ -61,7 +61,7 @@
 					style:background-color={post.author.avatarColor}
 					aria-hidden="true"
 				></span>
-				<p class="min-w-0 text-sm font-medium text-foreground">
+				<p class="min-w-0 truncate text-sm font-medium text-foreground">
 					{post.author.name}
 				</p>
 			</div>

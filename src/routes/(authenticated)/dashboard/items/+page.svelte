@@ -251,7 +251,9 @@
 			<TableBody>
 				{#each campaignsPage.campaigns as campaign (campaign.id)}
 					<TableRow>
-						<TableCell class="font-medium text-foreground">{campaign.name}</TableCell>
+						<TableCell class="font-medium text-foreground">
+							<div class="max-w-64 truncate">{campaign.name}</div>
+						</TableCell>
 						<TableCell>
 							{#if data.user.role === 'admin' || data.user.role === 'editor'}
 								<CampaignStatusEditor
@@ -267,9 +269,9 @@
 						</TableCell>
 						<TableCell>{m[`campaign.channel.${campaign.channel}`]()}</TableCell>
 						<TableCell>
-							<span class="flex items-center gap-2">
+							<span class="flex max-w-48 min-w-0 items-center gap-2">
 								<Avatar name={campaign.owner.name} size="sm" />
-								<span>{campaign.owner.name}</span>
+								<span class="min-w-0 truncate">{campaign.owner.name}</span>
 							</span>
 						</TableCell>
 						<TableCell class="text-right tabular-nums">

@@ -54,7 +54,7 @@
 </svelte:head>
 
 <main class="min-h-screen py-8 md:py-12">
-	<Container as="article" class="max-w-3xl">
+	<Container as="article" class="max-w-3xl break-words">
 		<Button href={backHref} variant="ghost" class="mb-8 -ml-3">
 			<ArrowLeft class="size-4" aria-hidden="true" />
 			{m['blog.back']()}
