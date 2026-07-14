@@ -133,7 +133,7 @@
 					<CardContent>
 						{#await data.summary}
 							<div
-								class="h-7 w-24 animate-pulse rounded-md bg-muted motion-reduce:animate-none"
+								class="h-8 w-24 animate-pulse rounded-md bg-muted motion-reduce:animate-none"
 								aria-hidden="true"
 							></div>
 							<span class="sr-only">{m['common.loading']()}</span>

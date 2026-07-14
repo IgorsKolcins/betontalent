@@ -1,4 +1,3 @@
-import { THEME_COOKIE_NAME, isThemeMode } from '$lib/contexts/Theme.svelte';
 import { getTextDirection } from '$lib/paraglide/runtime.js';
 import { paraglideMiddleware } from '$lib/paraglide/server.js';
 import { findUserById } from '$lib/server/auth/users';
@@ -6,9 +5,6 @@ import { clearSession, resolveSession } from '$lib/server/auth/session';
 import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
-	const cookieTheme = event.cookies.get(THEME_COOKIE_NAME);
-	const theme = isThemeMode(cookieTheme) ? cookieTheme : 'light';
-
 	return paraglideMiddleware(event.request, async ({ request, locale }) => {
 		event.request = request;
 		const session = await resolveSession(event.cookies);
@@ -22,11 +18,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 		return resolve(event, {
 			transformPageChunk: ({ html }) => {
-				const classAttribute = theme === 'dark' ? ' class="dark"' : '';
-				return html
-					.replace('%lang%', locale)
-					.replace('%dir%', getTextDirection(locale))
-					.replace('<html', `<html${classAttribute}`);
+				return html.replace('%lang%', locale).replace('%dir%', getTextDirection(locale));
 			}
 		});
 	});

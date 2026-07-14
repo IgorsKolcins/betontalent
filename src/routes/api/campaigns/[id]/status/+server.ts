@@ -17,5 +17,10 @@ export const PUT: RequestHandler = async ({ locals, params, request }) => {
 	const campaign = updateCampaignStatus(params.id, parsed.data.status);
 	if (!campaign) error(404, 'Campaign not found');
 
-	return json({ campaign });
+	return json(
+		{ campaign },
+		{
+			headers: { 'Cache-Control': 'private, no-store' }
+		}
+	);
 };

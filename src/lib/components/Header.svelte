@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
-	import { BookOpen, LayoutDashboard, LogIn, Menu, Moon, Search, Sun } from '@lucide/svelte';
+	import { BookOpen, LogIn, Menu, Moon, Search, Sun } from '@lucide/svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Container from '$lib/components/ui/Container.svelte';
 	import Drawer from '$lib/components/ui/Drawer.svelte';
@@ -13,13 +13,12 @@
 	const theme = getThemeContext();
 	const activeLocale = $derived(getLocale());
 	const nextLocale = $derived((activeLocale === 'en' ? 'de' : 'en') satisfies Locale);
-	const localeHref = $derived(
-		resolve(
-			localizeHref(deLocalizeHref(`${page.url.pathname}${page.url.search}`), {
-				locale: nextLocale
-			}) as '/'
-		)
-	);
+	const localeHref = $derived.by(() => {
+		const routePath = deLocalizeHref(page.url.pathname);
+		const currentUrl = routePath === '/' ? routePath : `${routePath}${page.url.search}`;
+
+		return resolve(localizeHref(currentUrl, { locale: nextLocale }) as '/');
+	});
 </script>
 
 {#snippet appearanceControls(close: (() => void) | undefined, fill: boolean)}
@@ -41,14 +40,11 @@
 	<Button
 		variant="icon"
 		onclick={() => theme.toggle()}
-		aria-label={theme.mode === 'dark' ? m['theme.switchToLight']() : m['theme.switchToDark']()}
-		title={theme.mode === 'dark' ? m['theme.switchToLight']() : m['theme.switchToDark']()}
+		aria-label={m['theme.toggle']()}
+		title={m['theme.toggle']()}
 	>
-		{#if theme.mode === 'dark'}
-			<Sun aria-hidden="true" class="size-4" />
-		{:else}
-			<Moon aria-hidden="true" class="size-4" />
-		{/if}
+		<Sun aria-hidden="true" class="hidden size-4 dark:block" />
+		<Moon aria-hidden="true" class="size-4 dark:hidden" />
 	</Button>
 {/snippet}
 
@@ -69,15 +65,9 @@
 			</Button>
 		</nav>
 		<div class="hidden items-center justify-end gap-2 md:flex">
-			{#if page.data.user}
-				<Button href={resolve(localizeHref('/dashboard') as '/dashboard')} class="h-9">
-					{m['nav.dashboard']()}
-				</Button>
-			{:else}
-				<Button href={resolve(localizeHref('/login') as '/login')} class="h-9">
-					{m['nav.login']()}
-				</Button>
-			{/if}
+			<Button href={resolve(localizeHref('/login') as '/login')} class="h-9">
+				{m['nav.login']()}
+			</Button>
 			{@render appearanceControls(undefined, false)}
 		</div>
 		<div class="md:hidden">
@@ -125,27 +115,15 @@
 							<Search aria-hidden="true" class="size-4" />
 							{m['nav.search']()}
 						</Button>
-						{#if page.data.user}
-							<Button
-								href={resolve(localizeHref('/dashboard') as '/dashboard')}
-								variant="ghost"
-								onclick={close}
-								class="h-10 w-full justify-start gap-3"
-							>
-								<LayoutDashboard aria-hidden="true" class="size-4" />
-								{m['nav.dashboard']()}
-							</Button>
-						{:else}
-							<Button
-								href={resolve(localizeHref('/login') as '/login')}
-								variant="ghost"
-								onclick={close}
-								class="h-10 w-full justify-start gap-3"
-							>
-								<LogIn aria-hidden="true" class="size-4" />
-								{m['nav.login']()}
-							</Button>
-						{/if}
+						<Button
+							href={resolve(localizeHref('/login') as '/login')}
+							variant="ghost"
+							onclick={close}
+							class="h-10 w-full justify-start gap-3"
+						>
+							<LogIn aria-hidden="true" class="size-4" />
+							{m['nav.login']()}
+						</Button>
 					</nav>
 
 					<div class="mt-auto flex items-center gap-2 border-t border-border p-3">

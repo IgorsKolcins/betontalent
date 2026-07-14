@@ -49,6 +49,10 @@ export type CampaignSummary = {
 	aggregateCtr: number;
 };
 
+export function getCampaignTotalCount(): number {
+	return campaigns.length;
+}
+
 export async function getCampaignSummary(): Promise<CampaignSummary> {
 	const totals = campaigns.reduce(
 		(summary, campaign) => ({
@@ -68,7 +72,7 @@ export async function getCampaignSummary(): Promise<CampaignSummary> {
 	};
 }
 
-export async function getCampaignPage(query: CampaignQuery, locale: string): Promise<CampaignPage> {
+export function getCampaignPage(query: CampaignQuery, locale: string): CampaignPage {
 	const normalizedQuery = query.q.toLocaleLowerCase(locale);
 	const filteredCampaigns = campaigns.filter(
 		(campaign) =>

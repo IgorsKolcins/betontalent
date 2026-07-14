@@ -4,6 +4,13 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
+		<script>
+			const theme = document.cookie
+				.split('; ')
+				.find((entry) => entry.startsWith('theme='))
+				?.split('=')[1];
+			document.documentElement.classList.toggle('dark', theme === 'dark');
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { getLocale } from '$lib/paraglide/runtime.js';
 	import { m } from '$lib/paraglide/messages.js';
-	import { goto, invalidateAll } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { navigating } from '$app/state';
 	import { deLocalizeHref, localizeHref } from '$lib/paraglide/runtime.js';
 	import type { PageData } from './$types';
 	import {
+		CAMPAIGNS_PER_PAGE,
 		createCampaignQueryParams,
 		splitCampaignSort,
 		type CampaignSort,
@@ -56,6 +57,8 @@
 		completed: 'completed',
 		archived: 'archived'
 	} as const;
+	const skeletonRows = Array.from({ length: CAMPAIGNS_PER_PAGE }, (_, index) => index);
+	const skeletonColumns = Array.from({ length: 8 }, (_, index) => index);
 	const defaultSortDirections: Record<CampaignSortField, CampaignSortDirection> = {
 		name: 'asc',
 		status: 'asc',
@@ -113,7 +116,7 @@
 	async function retryCampaigns(): Promise<void> {
 		isRetrying = true;
 		try {
-			await invalidateAll();
+			await invalidate('app:campaigns');
 		} finally {
 			isRetrying = false;
 		}
@@ -191,14 +194,24 @@
 			{#await data.campaignsPage}
 				<DelayedLoading>{m['common.loading']()}</DelayedLoading>
 			{:then campaignsPage}
-				{#if hasFilters}
-					{m['dashboard.items.filteredCount']({
-						count: campaignsPage.pagination.total,
-						total: campaignsPage.pagination.totalCount
-					})}
-				{:else}
-					{m['dashboard.items.count']({ count: campaignsPage.pagination.totalCount })}
-				{/if}
+				{#await data.campaignMetadata}
+					<DelayedLoading>{m['common.loading']()}</DelayedLoading>
+				{:then metadataResult}
+					{#if metadataResult.ok}
+						{#if hasFilters}
+							{m['dashboard.items.filteredCount']({
+								count: campaignsPage.pagination.total,
+								total: metadataResult.data.totalCount
+							})}
+						{:else}
+							{m['dashboard.items.count']({ count: metadataResult.data.totalCount })}
+						{/if}
+					{:else}
+						<span role="status">
+							{m['dashboard.items.partialCount']({ count: campaignsPage.pagination.total })}
+						</span>
+					{/if}
+				{/await}
 			{:catch}
 				{m['dashboard.items.error']()}
 			{/await}
@@ -216,32 +229,13 @@
 			<TableCaption class="sr-only">{m['dashboard.items.tableCaption']()}</TableCaption>
 			{@render campaignTableHeader()}
 			<TableBody>
-				{#each [1, 2, 3, 4, 5] as row (row)}
+				{#each skeletonRows as row (row)}
 					<TableRow class="hover:bg-transparent">
-						<TableCell class="h-14">
-							<div class="h-3 w-full animate-pulse rounded-full bg-muted"></div>
-						</TableCell>
-						<TableCell class="h-14">
-							<div class="h-3 w-full animate-pulse rounded-full bg-muted"></div>
-						</TableCell>
-						<TableCell class="h-14">
-							<div class="h-3 w-full animate-pulse rounded-full bg-muted"></div>
-						</TableCell>
-						<TableCell class="h-14">
-							<div class="h-3 w-full animate-pulse rounded-full bg-muted"></div>
-						</TableCell>
-						<TableCell class="h-14">
-							<div class="h-3 w-full animate-pulse rounded-full bg-muted"></div>
-						</TableCell>
-						<TableCell class="h-14">
-							<div class="h-3 w-full animate-pulse rounded-full bg-muted"></div>
-						</TableCell>
-						<TableCell class="h-14">
-							<div class="h-3 w-full animate-pulse rounded-full bg-muted"></div>
-						</TableCell>
-						<TableCell class="h-14">
-							<div class="h-3 w-full animate-pulse rounded-full bg-muted"></div>
-						</TableCell>
+						{#each skeletonColumns as column (column)}
+							<TableCell>
+								<div class="h-3 w-full animate-pulse rounded-full bg-muted"></div>
+							</TableCell>
+						{/each}
 					</TableRow>
 				{/each}
 			</TableBody>

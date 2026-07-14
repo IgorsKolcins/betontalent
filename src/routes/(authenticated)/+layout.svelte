@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { House, LayoutDashboard, List, Menu, Moon, Sun } from '@lucide/svelte';
-	import type { Snippet } from 'svelte';
+	import { untrack, type Snippet } from 'svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Drawer from '$lib/components/ui/Drawer.svelte';
 	import {
@@ -17,14 +17,18 @@
 		SidebarMenuButton,
 		SidebarProvider
 	} from '$lib/components/ui/Sidebar';
-	import { getThemeContext } from '$lib/contexts/Theme.svelte';
+	import { createThemeContext } from '$lib/contexts/Theme.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import { deLocalizeHref, getLocale, localizeHref, type Locale } from '$lib/paraglide/runtime.js';
 	import { cn } from '$lib/utils/cn';
 
-	let { children }: { children: Snippet } = $props();
+	let { children, data }: { children: Snippet; data: { theme: 'light' | 'dark' } } = $props();
 
-	const theme = getThemeContext();
+	const theme = createThemeContext(untrack(() => data.theme));
+
+	$effect(() => {
+		theme.apply();
+	});
 	const activeLocale = $derived(getLocale());
 	const nextLocale = $derived((activeLocale === 'en' ? 'de' : 'en') satisfies Locale);
 	const currentPath = $derived(deLocalizeHref(page.url.pathname));
@@ -96,14 +100,11 @@
 			<Button
 				variant="icon"
 				onclick={() => theme.toggle()}
-				aria-label={theme.mode === 'dark' ? m['theme.switchToLight']() : m['theme.switchToDark']()}
-				title={theme.mode === 'dark' ? m['theme.switchToLight']() : m['theme.switchToDark']()}
+				aria-label={m['theme.toggle']()}
+				title={m['theme.toggle']()}
 			>
-				{#if theme.mode === 'dark'}
-					<Sun aria-hidden="true" class="size-4" />
-				{:else}
-					<Moon aria-hidden="true" class="size-4" />
-				{/if}
+				<Sun aria-hidden="true" class="hidden size-4 dark:block" />
+				<Moon aria-hidden="true" class="size-4 dark:hidden" />
 			</Button>
 		</div>
 	</SidebarFooter>

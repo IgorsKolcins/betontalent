@@ -1,3 +1,4 @@
+import { browser } from '$app/environment';
 import { getContext, setContext } from 'svelte';
 
 export type ThemeMode = 'light' | 'dark';
@@ -7,6 +8,10 @@ export const THEME_COOKIE_NAME = 'theme';
 
 export function isThemeMode(value: string | undefined): value is ThemeMode {
 	return value === 'light' || value === 'dark';
+}
+
+export function getInitialThemeMode(): ThemeMode {
+	return browser && document.documentElement.classList.contains('dark') ? 'dark' : 'light';
 }
 
 export class ThemeContext {
