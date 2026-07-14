@@ -12,6 +12,7 @@ node_modules
 .wrangler
 /.svelte-kit
 /build
+e2e/__screenshots__
 
 # OS
 .DS_Store

@@ -19,7 +19,10 @@
 	{perPage}
 	bind:page
 	bind:ref
-	class={cn('my-8 flex flex-wrap items-center gap-y-3 sm:grid sm:grid-cols-12 sm:gap-y-0', className)}
+	class={cn(
+		'my-8 flex flex-wrap items-center gap-y-3 sm:grid sm:grid-cols-12 sm:gap-y-0',
+		className
+	)}
 	{...restRoot}
 >
 	{#snippet children({ pages, range })}
@@ -28,7 +31,9 @@
 		>
 			{m['pagination.range']({ start: range.start, end: range.end })}
 		</p>
-		<div class="order-1 flex w-full items-center justify-center gap-2 sm:order-none sm:col-start-3 sm:col-end-11">
+		<div
+			class="order-1 flex w-full items-center justify-center gap-2 sm:order-none sm:col-start-3 sm:col-end-11"
+		>
 			<Pagination.PrevButton
 				aria-label={m['pagination.previous']()}
 				title={m['pagination.previous']()}
