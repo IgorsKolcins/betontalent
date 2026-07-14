@@ -2,13 +2,31 @@ import { describe, expect, it } from 'vitest';
 import {
 	campaignQuerySchema,
 	createCampaignQueryParams,
-	queryForCampaignRoute,
+	decodeCampaignQuery,
 	splitCampaignSort
 } from './query';
 
 describe('campaign URL state codec', () => {
+	it('normalizes each invalid URL field without discarding valid filters', () => {
+		const params = new URLSearchParams({
+			q: '  launch  ',
+			status: 'not-a-status',
+			channel: 'email',
+			sort: 'not-a-sort',
+			page: '0'
+		});
+
+		expect(decodeCampaignQuery(params)).toEqual({
+			q: 'launch',
+			status: '',
+			channel: 'email',
+			sort: 'startDate-desc',
+			page: 1
+		});
+	});
+
 	it('decodes URL values into normalized campaign state', () => {
-		const query = campaignQuerySchema.parse({
+		const params = new URLSearchParams({
 			q: '  launch  ',
 			status: 'active',
 			channel: 'email',
@@ -16,7 +34,7 @@ describe('campaign URL state codec', () => {
 			page: '3'
 		});
 
-		expect(queryForCampaignRoute(query)).toEqual({
+		expect(decodeCampaignQuery(params)).toEqual({
 			q: 'launch',
 			status: 'active',
 			channel: 'email',
@@ -29,6 +47,15 @@ describe('campaign URL state codec', () => {
 		const query = campaignQuerySchema.parse({ q: 'launch', status: 'active' });
 
 		expect(createCampaignQueryParams(query)).toBe('q=launch&status=active');
+	});
+
+	it('accepts start date sorting and rejects the removed updated-at option', () => {
+		expect(decodeCampaignQuery(new URLSearchParams('sort=startDate-asc')).sort).toBe(
+			'startDate-asc'
+		);
+		expect(decodeCampaignQuery(new URLSearchParams('sort=updatedAt-desc')).sort).toBe(
+			'startDate-desc'
+		);
 	});
 
 	it('preserves filters and sort while resetting pagination after a control change', () => {

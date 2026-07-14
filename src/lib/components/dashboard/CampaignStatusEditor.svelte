@@ -1,4 +1,9 @@
 <script lang="ts">
+	import { invalidate } from '$app/navigation';
+	import {
+		updateCampaignStatus,
+		type CampaignStatusUpdateFailure
+	} from '$lib/api/campaigns/status';
 	import { CAMPAIGN_STATUSES, type CampaignStatus } from '$lib/campaigns/query';
 	import { m } from '$lib/paraglide/messages.js';
 	import LoadingSpinner from '$lib/components/ui/LoadingSpinner.svelte';
@@ -22,20 +27,39 @@
 		errorMessage = '';
 		isSaving = true;
 
-		try {
-			const response = await fetch(`/api/campaigns/${campaignId}/status`, {
-				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ status: optimisticStatus })
-			});
+		const result = await updateCampaignStatus(fetch, campaignId, optimisticStatus);
 
-			if (!response.ok) throw new Error(`Campaign update failed with status ${response.status}`);
-			status = optimisticStatus;
-		} catch {
+		if (!result.ok) {
 			optimisticStatus = previousStatus;
-			errorMessage = m['dashboard.items.statusUpdateError']({ name: campaignName });
+			errorMessage = errorMessageFor(result.reason);
+			isSaving = false;
+			return;
+		}
+
+		status = result.campaign.status;
+		try {
+			await invalidate('app:campaigns');
+		} catch {
+			errorMessage = m['dashboard.items.statusRefreshError']();
 		} finally {
 			isSaving = false;
+		}
+	}
+
+	function errorMessageFor(reason: CampaignStatusUpdateFailure): string {
+		switch (reason) {
+			case 'unauthenticated':
+				return m['dashboard.items.statusUpdateUnauthenticated']();
+			case 'forbidden':
+				return m['dashboard.items.error.forbidden']();
+			case 'validation':
+				return m['dashboard.items.statusUpdateInvalid']({ name: campaignName });
+			case 'not-found':
+				return m['dashboard.items.statusUpdateNotFound']({ name: campaignName });
+			case 'network':
+				return m['dashboard.items.statusUpdateNetwork']({ name: campaignName });
+			case 'server':
+				return m['dashboard.items.statusUpdateError']({ name: campaignName });
 		}
 	}
 </script>

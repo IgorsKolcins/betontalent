@@ -34,10 +34,10 @@
 				<p class="text-sm font-medium text-muted-foreground">
 					{m['blog.postsCount']({ count: postsPage.pagination.total })}
 				</p>
-				<PostControls mode="blog" formData={data.formData} class="shrink-0" />
+				<PostControls mode="blog" query={data.query} class="shrink-0" />
 			</div>
 		{/if}
 
-		<PostResults mode="blog" query={data.formData.data} result={data.postsResult} />
+		<PostResults mode="blog" query={data.query} result={data.postsResult} />
 	</Container>
 </main>

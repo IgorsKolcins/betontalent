@@ -48,7 +48,9 @@
 		<link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />
 	{/each}
 	<link rel="alternate" hreflang="x-default" href={data.seo.xDefault} />
-	{@html `<script type="application/ld+json">${JSON.stringify(articleJsonLd).replaceAll('<', '\\u003c')}<\/script>`}
+	<svelte:element this={"script"} type="application/ld+json">
+		{JSON.stringify(articleJsonLd)}
+	</svelte:element>
 </svelte:head>
 
 <main class="min-h-screen py-8 md:py-12">

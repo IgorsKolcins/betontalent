@@ -64,7 +64,7 @@
 		budget: 'desc',
 		spent: 'desc',
 		ctr: 'desc',
-		updatedAt: 'desc'
+		startDate: 'desc'
 	};
 	const query = $derived(data.query);
 	const activeSort = $derived(splitCampaignSort(query.sort));
@@ -170,10 +170,10 @@
 				sortLabel={sortLabel('ctr', m['dashboard.items.column.ctr']())}
 			/>
 			<TableSortableHead
-				onclick={() => handleSort('updatedAt')}
-				label={m['dashboard.items.column.updated']()}
-				sortDirection={sortDirection('updatedAt')}
-				sortLabel={sortLabel('updatedAt', m['dashboard.items.column.updated']())}
+				onclick={() => handleSort('startDate')}
+				label={m['dashboard.items.column.startDate']()}
+				sortDirection={sortDirection('startDate')}
+				sortLabel={sortLabel('startDate', m['dashboard.items.column.startDate']())}
 			/>
 		</TableRow>
 	</TableHeader>
@@ -205,7 +205,7 @@
 		</p>
 	</header>
 
-	<CampaignControls formData={data.formData} />
+	<CampaignControls {query} />
 
 	{#await data.campaignsPage}
 		<Table
@@ -287,7 +287,7 @@
 						<TableCell class="text-right tabular-nums">
 							{percentFormatter.format(campaign.ctr)}
 						</TableCell>
-						<TableCell>{dateFormatter.format(new Date(campaign.updatedAt))}</TableCell>
+						<TableCell>{dateFormatter.format(new Date(campaign.startDate))}</TableCell>
 					</TableRow>
 				{:else}
 					<TableRow class="hover:bg-transparent">

@@ -29,6 +29,20 @@ export type PostQuery = PostQueryForm & {
 	locale: 'en' | 'de';
 };
 
+export function decodePostQuery(searchParams: URLSearchParams, mode: PostRouteMode): PostQueryForm {
+	const q = postQueryFormSchema.shape.q.safeParse(searchParams.get('q') ?? undefined);
+	const tag = postQueryFormSchema.shape.tag.safeParse(searchParams.get('tag') ?? undefined);
+	const sort = postQueryFormSchema.shape.sort.safeParse(searchParams.get('sort') ?? undefined);
+	const page = postQueryFormSchema.shape.page.safeParse(searchParams.get('page') ?? undefined);
+
+	return {
+		q: mode === 'search' && q.success ? q.data : '',
+		tag: mode === 'search' && tag.success ? tag.data : '',
+		sort: sort.success ? sort.data : DEFAULT_POST_SORT,
+		page: page.success ? page.data : 1
+	};
+}
+
 export function createPostQueryParams(query: Partial<PostQueryForm>): string {
 	const params = new URLSearchParams();
 

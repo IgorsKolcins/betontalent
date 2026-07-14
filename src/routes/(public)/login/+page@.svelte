@@ -84,7 +84,7 @@
 				</div>
 			{/if}
 
-			<form method="POST" aria-describedby="login-form-error" {@attach enhanceForm}>
+			<form method="POST" novalidate aria-describedby="login-form-error" {@attach enhanceForm}>
 				<FormField
 					label={m['login.email']()}
 					error={$errors.email?.[0]}

@@ -27,12 +27,12 @@
 	const readingTimeMinutes = $derived(numberFormatter.format(post.readingTimeMinutes));
 	const returnTo = $derived(`${page.url.pathname}${page.url.search}`);
 	const postHref = $derived(
-		`${resolve(localizeHref(`/blog/${post.slug}`) as '/blog/[slug]')}?returnTo=${encodeURIComponent(returnTo)}`
+		`${localizeHref(`/blog/${post.slug}`)}?returnTo=${encodeURIComponent(returnTo)}`
 	);
 </script>
 
 <a
-	href={postHref}
+	href={resolve(postHref as '/blog/[slug]')}
 	class="group block rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
 	aria-label={m['blog.readMoreLabel']({ title: post.title })}
 >

@@ -17,12 +17,12 @@ export const CAMPAIGN_SORT_FIELDS = [
 	'budget',
 	'spent',
 	'ctr',
-	'updatedAt'
+	'startDate'
 ] as const;
 export const CAMPAIGN_SORT_DIRECTIONS = ['asc', 'desc'] as const;
 export const CAMPAIGNS_PER_PAGE = 20;
 export const MAX_CAMPAIGN_QUERY_LENGTH = 120;
-export const DEFAULT_CAMPAIGN_SORT = 'updatedAt-desc';
+export const DEFAULT_CAMPAIGN_SORT = 'startDate-desc';
 
 export type CampaignStatus = (typeof CAMPAIGN_STATUSES)[number];
 export type CampaignChannel = (typeof CAMPAIGN_CHANNELS)[number];
@@ -49,14 +49,19 @@ export const campaignQuerySchema = z.object({
 
 export type CampaignQuery = z.infer<typeof campaignQuerySchema>;
 
-export function queryForCampaignRoute(query: CampaignQuery): CampaignQuery {
-	const status = campaignStatusFilterSchema.safeParse(query.status);
-	const channel = campaignChannelFilterSchema.safeParse(query.channel);
-	const sort = campaignSortSchema.safeParse(query.sort);
-	const page = campaignPageSchema.safeParse(query.page);
+export function decodeCampaignQuery(searchParams: URLSearchParams): CampaignQuery {
+	const q = campaignQuerySchema.shape.q.safeParse(searchParams.get('q') ?? undefined);
+	const status = campaignQuerySchema.shape.status.safeParse(
+		searchParams.get('status') ?? undefined
+	);
+	const channel = campaignQuerySchema.shape.channel.safeParse(
+		searchParams.get('channel') ?? undefined
+	);
+	const sort = campaignQuerySchema.shape.sort.safeParse(searchParams.get('sort') ?? undefined);
+	const page = campaignQuerySchema.shape.page.safeParse(searchParams.get('page') ?? undefined);
 
 	return {
-		q: typeof query.q === 'string' ? query.q.trim() : '',
+		q: q.success ? q.data : '',
 		status: status.success ? status.data : '',
 		channel: channel.success ? channel.data : '',
 		sort: sort.success ? sort.data : DEFAULT_CAMPAIGN_SORT,

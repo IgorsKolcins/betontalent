@@ -29,8 +29,7 @@ export default defineConfig({
 			],
 			routeStrategies: [
 				{ match: '/api/:path(.*)?', exclude: true },
-				{ match: '/sitemap.xml', exclude: true },
-				{ match: '/demo/:path(.*)?', exclude: true }
+				{ match: '/sitemap.xml', exclude: true }
 			]
 		}),
 		tailwindcss(),

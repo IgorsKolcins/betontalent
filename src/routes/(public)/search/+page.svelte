@@ -31,11 +31,11 @@
 
 		<PostControls
 			mode="search"
-			formData={data.formData}
+			query={data.query}
 			tags={postsPage?.tags ?? []}
 			totalCount={postsPage?.pagination.total ?? 0}
 		/>
 
-		<PostResults mode="search" query={data.formData.data} result={data.postsResult} />
+		<PostResults mode="search" query={data.query} result={data.postsResult} />
 	</Container>
 </main>

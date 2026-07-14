@@ -4,7 +4,7 @@
 	import { cn } from '$lib/utils/cn';
 
 	const buttonVariants = cva(
-		'inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-semibold transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 active:scale-[0.98]',
+		'inline-flex shrink-0 items-center cursor-pointer justify-center gap-2 rounded-md text-sm font-semibold transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 active:scale-[0.98]',
 		{
 			variants: {
 				variant: {

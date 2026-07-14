@@ -10,3 +10,4 @@ bun.lockb
 project.inlang/.meta.json
 project.inlang/README.md
 src/lib/paraglide/
+mocks/*.json

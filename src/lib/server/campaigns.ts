@@ -128,7 +128,7 @@ function compareCampaigns(
 		case 'spent':
 		case 'ctr':
 			return left[field] - right[field];
-		case 'updatedAt':
-			return left.updatedAt.localeCompare(right.updatedAt);
+		case 'startDate':
+			return left.startDate.localeCompare(right.startDate);
 	}
 }
