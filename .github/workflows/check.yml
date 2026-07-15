@@ -31,5 +31,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate Paraglide modules
+        run: npx paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide --strategy url cookie baseLocale
+
       - name: Run Svelte and TypeScript checks
         run: npm run check
