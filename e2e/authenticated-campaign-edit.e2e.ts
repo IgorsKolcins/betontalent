@@ -4,6 +4,7 @@ import { expect, test } from '@playwright/test';
 test('an authenticated editor sees an accessible dashboard and campaign edits stay consistent', async ({
 	page
 }) => {
+	// Establish an editor session and confirm the protected dashboard is reachable.
 	await page.goto('/en/login');
 	await page.getByLabel('Email').fill('editor@demo.test');
 	await page.getByLabel('Password').fill('demo1234');
@@ -12,6 +13,7 @@ test('an authenticated editor sees an accessible dashboard and campaign edits st
 	await expect(page).toHaveURL(/\/en\/dashboard$/);
 	await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
 
+	// The public navigation should recognize the session and offer Dashboard instead of Sign in.
 	await page.goto('/en');
 	const dashboardLink = page.getByRole('link', { name: 'Dashboard', exact: true });
 	await expect(dashboardLink).toBeVisible();
@@ -19,6 +21,7 @@ test('an authenticated editor sees an accessible dashboard and campaign edits st
 	await dashboardLink.click();
 	await expect(page).toHaveURL(/\/en\/dashboard$/);
 
+	// Keep the authenticated dashboard free of serious and critical accessibility violations.
 	const accessibility = await new AxeBuilder({ page }).analyze();
 	const seriousOrCritical = accessibility.violations.filter(
 		(violation) => violation.impact === 'serious' || violation.impact === 'critical'
@@ -32,6 +35,7 @@ test('an authenticated editor sees an accessible dashboard and campaign edits st
 	const status = page.getByRole('combobox', { name: `Edit status for ${campaignName}` });
 	await expect(status).toHaveValue('active');
 
+	// Failure path: expose the optimistic value while the request is pending, then verify rollback.
 	let requestBody: unknown;
 	await page.route('**/api/campaigns/*/status', async (route) => {
 		requestBody = route.request().postDataJSON();
@@ -51,6 +55,7 @@ test('an authenticated editor sees an accessible dashboard and campaign edits st
 	await expect(status).toHaveValue('active');
 	expect(requestBody).toEqual({ status: 'completed' });
 
+	// Success path: keep the editor interactive and preserve row order after confirmation.
 	await page.unroute('**/api/campaigns/*/status');
 	const campaignRows = page.locator('tbody tr');
 	const rowIndexBeforeUpdate = await campaignRows.evaluateAll(
@@ -77,6 +82,7 @@ test('an authenticated editor sees an accessible dashboard and campaign edits st
 		)
 	).toBe(rowIndexBeforeUpdate);
 
+	// A confirmed edit intentionally stays optimistic in the current filtered view without invalidation.
 	await page.unroute('**/api/campaigns/*/status');
 	await page.goto('/en/dashboard/items?q=Autumn+%E2%80%94+Beta+program+%23213&status=completed');
 	const filteredStatus = page.getByRole('combobox', { name: `Edit status for ${campaignName}` });
@@ -95,6 +101,11 @@ test('an authenticated editor sees an accessible dashboard and campaign edits st
 	await expect(filteredStatus).toBeEnabled();
 	await filteredUpdate;
 
-	await expect(page.getByText('No campaigns match these filters.')).toBeVisible();
+	await expect(filteredStatus).toHaveValue('active');
+	await expect(page.getByText('No campaigns match these filters.')).toHaveCount(0);
 	await expect(page).toHaveURL(/q=Autumn.*status=completed/);
+
+	// Refreshing reloads authoritative server data, so the completed filter then excludes this campaign.
+	await page.reload();
+	await expect(page.getByText('No campaigns match these filters.')).toBeVisible();
 });
