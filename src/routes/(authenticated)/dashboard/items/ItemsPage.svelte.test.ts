@@ -5,7 +5,7 @@ import {
 	CAMPAIGNS_PER_PAGE,
 	DEFAULT_CAMPAIGN_SORT,
 	type CampaignQuery
-} from '$lib/campaigns/query';
+} from '$lib/api/campaigns/query';
 import type { Campaign, CampaignPage } from '$lib/server/campaigns';
 import type { PageData } from './$types';
 import ItemsPage from './+page.svelte';

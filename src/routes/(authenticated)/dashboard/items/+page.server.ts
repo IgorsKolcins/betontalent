@@ -1,5 +1,5 @@
 import { getLocale } from '$lib/paraglide/runtime.js';
-import { decodeCampaignQuery } from '$lib/campaigns/query';
+import { decodeCampaignQuery } from '$lib/api/campaigns/query';
 import { loadCampaignMetadata, loadCampaignPage } from '$lib/server/campaign-repository';
 import type { PageServerLoad } from './$types';
 

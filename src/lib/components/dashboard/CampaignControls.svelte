@@ -8,7 +8,7 @@
 		CAMPAIGN_STATUSES,
 		MAX_CAMPAIGN_QUERY_LENGTH,
 		type CampaignQuery
-	} from '$lib/campaigns/query';
+	} from '$lib/api/campaigns/query';
 	import FormField from '$lib/components/ui/FormField.svelte';
 	import SearchInput from '$lib/components/ui/SearchInput.svelte';
 	import Select from '$lib/components/ui/Select.svelte';

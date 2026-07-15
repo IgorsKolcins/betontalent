@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { Check } from '@lucide/svelte';
-	import type { HomepageContent } from '$lib/homepage/schema';
+	import type { HomepageContent } from '$lib/api/homepage/schema';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Container from '$lib/components/ui/Container.svelte';
 	import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/Card';

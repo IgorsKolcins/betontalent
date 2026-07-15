@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
 	import { untrack } from 'svelte';
 	import {
 		updateCampaignStatus,
 		type CampaignStatusUpdateFailure
 	} from '$lib/api/campaigns/status';
-	import { CAMPAIGN_STATUSES, type CampaignStatus } from '$lib/campaigns/query';
+	import { CAMPAIGN_STATUSES, type CampaignStatus } from '$lib/api/campaigns/query';
 	import { m } from '$lib/paraglide/messages.js';
 	import Select from '$lib/components/ui/Select.svelte';
 
@@ -35,7 +34,6 @@
 		if (isProcessing) return;
 
 		isProcessing = true;
-		let savedAnyStatus = false;
 
 		while (pendingStatuses.length > 0) {
 			const requestedStatus = pendingStatuses.shift();
@@ -50,20 +48,8 @@
 			}
 
 			confirmedStatus = result.campaign.status;
-			savedAnyStatus = true;
+			if (pendingStatuses.length === 0) optimisticStatus = confirmedStatus;
 			errorMessage = '';
-		}
-
-		if (savedAnyStatus) {
-			try {
-				await invalidate('app:campaigns');
-			} catch {
-				errorMessage = m['dashboard.items.statusRefreshError']();
-			}
-
-			if (pendingStatuses.length > 0) {
-				optimisticStatus = pendingStatuses.at(-1) ?? confirmedStatus;
-			}
 		}
 
 		isProcessing = false;
