@@ -23,6 +23,16 @@ export const CAMPAIGN_SORT_DIRECTIONS = ['asc', 'desc'] as const;
 export const CAMPAIGNS_PER_PAGE = 20;
 export const MAX_CAMPAIGN_QUERY_LENGTH = 120;
 export const DEFAULT_CAMPAIGN_SORT = 'startDate-desc';
+export const CAMPAIGN_DEFAULT_SORT_DIRECTIONS: Record<CampaignSortField, CampaignSortDirection> = {
+	name: 'asc',
+	status: 'asc',
+	channel: 'asc',
+	owner: 'asc',
+	budget: 'desc',
+	spent: 'desc',
+	ctr: 'desc',
+	startDate: 'desc'
+};
 
 export type CampaignStatus = (typeof CAMPAIGN_STATUSES)[number];
 export type CampaignChannel = (typeof CAMPAIGN_CHANNELS)[number];
@@ -91,4 +101,19 @@ export function splitCampaignSort(sort: CampaignSort): {
 		field: sort.slice(0, separator) as CampaignSortField,
 		direction: sort.slice(separator + 1) as CampaignSortDirection
 	};
+}
+
+export function nextCampaignSort(
+	currentSort: CampaignSort,
+	field: CampaignSortField
+): CampaignSort {
+	const activeSort = splitCampaignSort(currentSort);
+	const defaultDirection = CAMPAIGN_DEFAULT_SORT_DIRECTIONS[field];
+
+	if (activeSort.field !== field) return `${field}-${defaultDirection}`;
+	if (activeSort.direction === defaultDirection) {
+		return `${field}-${defaultDirection === 'asc' ? 'desc' : 'asc'}`;
+	}
+
+	return DEFAULT_CAMPAIGN_SORT;
 }

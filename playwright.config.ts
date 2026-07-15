@@ -8,6 +8,5 @@ export default defineConfig({
 		reuseExistingServer: !process.env.CI
 	},
 	testDir: './e2e',
-	testMatch: '**/*.e2e.{ts,js}',
-	snapshotPathTemplate: '{testDir}/__screenshots__/{arg}{ext}'
+	testMatch: '**/*.e2e.{ts,js}'
 });

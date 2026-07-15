@@ -1,13 +1,12 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
+	import { untrack } from 'svelte';
 	import {
 		updateCampaignStatus,
 		type CampaignStatusUpdateFailure
 	} from '$lib/api/campaigns/status';
 	import { CAMPAIGN_STATUSES, type CampaignStatus } from '$lib/campaigns/query';
 	import { m } from '$lib/paraglide/messages.js';
-	import DelayedLoading from '$lib/components/ui/DelayedLoading.svelte';
-	import LoadingSpinner from '$lib/components/ui/LoadingSpinner.svelte';
 	import Select from '$lib/components/ui/Select.svelte';
 
 	let {
@@ -21,31 +20,54 @@
 	} = $props();
 
 	let optimisticStatus = $derived(status);
-	let isSaving = $state(false);
 	let errorMessage = $state('');
+	let confirmedStatus = untrack(() => status);
+	let isProcessing = false;
+	const pendingStatuses: CampaignStatus[] = [];
 
-	async function updateStatus(): Promise<void> {
-		const previousStatus = status;
+	function queueStatusUpdate(): void {
 		errorMessage = '';
-		isSaving = true;
+		pendingStatuses.push(optimisticStatus);
+		void processStatusQueue();
+	}
 
-		const result = await updateCampaignStatus(fetch, campaignId, optimisticStatus);
+	async function processStatusQueue(): Promise<void> {
+		if (isProcessing) return;
 
-		if (!result.ok) {
-			optimisticStatus = previousStatus;
-			errorMessage = errorMessageFor(result.reason);
-			isSaving = false;
-			return;
+		isProcessing = true;
+		let savedAnyStatus = false;
+
+		while (pendingStatuses.length > 0) {
+			const requestedStatus = pendingStatuses.shift();
+			if (!requestedStatus) continue;
+
+			const result = await updateCampaignStatus(fetch, campaignId, requestedStatus);
+
+			if (!result.ok) {
+				errorMessage = errorMessageFor(result.reason);
+				if (pendingStatuses.length === 0) optimisticStatus = confirmedStatus;
+				continue;
+			}
+
+			confirmedStatus = result.campaign.status;
+			savedAnyStatus = true;
+			errorMessage = '';
 		}
 
-		status = result.campaign.status;
-		try {
-			await invalidate('app:campaigns');
-		} catch {
-			errorMessage = m['dashboard.items.statusRefreshError']();
-		} finally {
-			isSaving = false;
+		if (savedAnyStatus) {
+			try {
+				await invalidate('app:campaigns');
+			} catch {
+				errorMessage = m['dashboard.items.statusRefreshError']();
+			}
+
+			if (pendingStatuses.length > 0) {
+				optimisticStatus = pendingStatuses.at(-1) ?? confirmedStatus;
+			}
 		}
+
+		isProcessing = false;
+		if (pendingStatuses.length > 0) void processStatusQueue();
 	}
 
 	function errorMessageFor(reason: CampaignStatusUpdateFailure): string {
@@ -67,33 +89,16 @@
 </script>
 
 <div class="min-w-40 space-y-1.5">
-	<div class="flex items-center gap-2">
-		<Select
-			variant="ghost"
-			class="disabled:cursor-wait disabled:opacity-60"
-			bind:value={optimisticStatus}
-			onchange={updateStatus}
-			disabled={isSaving}
-			aria-label={m['dashboard.items.editStatusLabel']({ name: campaignName })}
-			aria-busy={isSaving}
-		>
-			{#each CAMPAIGN_STATUSES as option (option)}
-				<option value={option}>{m[`campaign.status.${option}`]()}</option>
-			{/each}
-		</Select>
-		<span class="flex size-4 shrink-0 items-center justify-center">
-			{#if isSaving}
-				<DelayedLoading>
-					<span
-						role="status"
-						aria-label={m['dashboard.items.statusSaving']({ name: campaignName })}
-					>
-						<LoadingSpinner />
-					</span>
-				</DelayedLoading>
-			{/if}
-		</span>
-	</div>
+	<Select
+		variant="ghost"
+		bind:value={optimisticStatus}
+		onchange={queueStatusUpdate}
+		aria-label={m['dashboard.items.editStatusLabel']({ name: campaignName })}
+	>
+		{#each CAMPAIGN_STATUSES as option (option)}
+			<option value={option}>{m[`campaign.status.${option}`]()}</option>
+		{/each}
+	</Select>
 	{#if errorMessage}
 		<p class="max-w-52 text-xs font-medium text-destructive" role="alert">{errorMessage}</p>
 	{/if}

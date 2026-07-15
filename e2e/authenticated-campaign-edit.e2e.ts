@@ -45,9 +45,7 @@ test('an authenticated editor sees an accessible dashboard and campaign edits st
 
 	await status.selectOption('completed');
 	await expect(status).toHaveValue('completed');
-	await expect(
-		page.getByRole('status', { name: `Saving status for ${campaignName}` })
-	).toBeVisible();
+	await expect(status).toBeEnabled();
 
 	await expect(page.getByRole('alert')).toContainText('The previous status was restored.');
 	await expect(status).toHaveValue('active');
@@ -64,14 +62,14 @@ test('an authenticated editor sees an accessible dashboard and campaign edits st
 		await route.continue();
 	});
 
+	const successfulUpdate = page.waitForResponse(
+		(response) =>
+			response.url().includes('/api/campaigns/') && response.request().method() === 'PUT'
+	);
 	await status.selectOption('completed');
-	await expect(
-		page.getByRole('status', { name: `Saving status for ${campaignName}` })
-	).toBeVisible();
 	await expect(status).toHaveValue('completed');
-	await expect(
-		page.getByRole('status', { name: `Saving status for ${campaignName}` })
-	).toBeHidden();
+	await expect(status).toBeEnabled();
+	await successfulUpdate;
 	expect(
 		await campaignRows.evaluateAll(
 			(rows, name) => rows.findIndex((row) => row.textContent?.includes(name)),
@@ -88,11 +86,14 @@ test('an authenticated editor sees an accessible dashboard and campaign edits st
 		await route.continue();
 	});
 
+	const filteredUpdate = page.waitForResponse(
+		(response) =>
+			response.url().includes('/api/campaigns/') && response.request().method() === 'PUT'
+	);
 	await filteredStatus.selectOption('active');
 	await expect(filteredStatus).toHaveValue('active');
-	await expect(
-		page.getByRole('status', { name: `Saving status for ${campaignName}` })
-	).toBeVisible();
+	await expect(filteredStatus).toBeEnabled();
+	await filteredUpdate;
 
 	await expect(page.getByText('No campaigns match these filters.')).toBeVisible();
 	await expect(page).toHaveURL(/q=Autumn.*status=completed/);

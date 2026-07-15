@@ -42,13 +42,13 @@ Test coverage includes:
 
 ## CI/CD
 
-Pull requests targeting `main` start three independent GitHub Actions workflows in parallel:
+Pull requests targeting `main` and pushes to `main` start one GitHub Actions `CI` workflow with three independent jobs running in parallel:
 
 - **Check** — runs `svelte-check` and TypeScript diagnostics through `npm run check`.
 - **Lint** — runs Prettier and ESLint through `npm run lint`.
 - **Test** — runs the Vitest and Playwright suites through `npm test`.
 
-Superseded runs are cancelled when a new commit is pushed to the pull request. The three checks should be configured as required status checks in the `main` branch protection rule. Vercel remains responsible for preview and production deployments; merging to `main` is the production deployment boundary.
+Superseded runs on the same branch are cancelled when a new commit is pushed. The three jobs should be configured as required status checks in the `main` branch protection rule. Vercel remains responsible for preview and production deployments; merging to `main` is the production deployment boundary.
 
 ## Demo login
 
@@ -90,7 +90,7 @@ p.s. Attached .html with task description feels too vibe-coded.
 
 - I kept URL state and server data loading as the source of truth. Public content is static or SSR, dashboard data is streamed, and mock JSON is validated once at the server boundary.
 - The campaign store is intentionally in memory, so edits reset when the server restarts. The static public header also avoids session personalization to keep the homepage cacheable.
-- I chose GitHub Actions for pull-request quality gates and Vercel for deployment. The workflows run independently to reduce feedback time, while Vercel's SvelteKit adapter provides the required per-route Edge and Node runtime split plus Git-based preview and production deployments. Lighthouse and bundle-budget gates remain manual.
+- I chose GitHub Actions for pull-request quality gates and Vercel for deployment. The CI jobs run independently in one workflow to keep feedback fast and configuration easy to follow, while Vercel's SvelteKit adapter provides the required per-route Edge and Node runtime split plus Git-based preview and production deployments. Lighthouse and bundle-budget gates remain manual.
 
 ### Challenges encountered
 
