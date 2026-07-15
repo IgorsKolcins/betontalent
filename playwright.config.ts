@@ -9,5 +9,5 @@ export default defineConfig({
 	},
 	testDir: './e2e',
 	testMatch: '**/*.e2e.{ts,js}',
-	snapshotPathTemplate: '{testDir}/__screenshots__/{arg}{ext}'
+	snapshotPathTemplate: '{testDir}/__screenshots__/{arg}-{platform}{ext}'
 });
