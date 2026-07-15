@@ -90,7 +90,10 @@
 						<Button
 							href={resolve(localizeHref('/login') as '/login')}
 							variant={plan.highlighted ? 'default' : 'secondary'}
-							class="h-10 w-full"
+							class={cn('h-10 w-full', {
+								'hover:-translate-y-0.5 hover:border-foreground/40 hover:shadow-md':
+									!plan.highlighted
+							})}
 						>
 							{m[`home.pricing.plan.${plan.id}.cta`]()}
 						</Button>

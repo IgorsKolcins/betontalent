@@ -9,9 +9,9 @@
 	import {
 		CAMPAIGNS_PER_PAGE,
 		createCampaignQueryParams,
+		DEFAULT_CAMPAIGN_SORT,
+		nextCampaignSort,
 		splitCampaignSort,
-		type CampaignSort,
-		type CampaignSortDirection,
 		type CampaignSortField
 	} from '$lib/campaigns/query';
 	import CampaignControls from '$lib/components/dashboard/CampaignControls.svelte';
@@ -59,16 +59,6 @@
 	} as const;
 	const skeletonRows = Array.from({ length: CAMPAIGNS_PER_PAGE }, (_, index) => index);
 	const skeletonColumns = Array.from({ length: 8 }, (_, index) => index);
-	const defaultSortDirections: Record<CampaignSortField, CampaignSortDirection> = {
-		name: 'asc',
-		status: 'asc',
-		channel: 'asc',
-		owner: 'asc',
-		budget: 'desc',
-		spent: 'desc',
-		ctr: 'desc',
-		startDate: 'desc'
-	};
 	const query = $derived(data.query);
 	const activeSort = $derived(splitCampaignSort(query.sort));
 	const hasFilters = $derived(Boolean(query.q || query.status || query.channel));
@@ -76,26 +66,23 @@
 		Boolean(navigating?.to && deLocalizeHref(navigating.to.url.pathname) === '/dashboard/items')
 	);
 
-	function nextSort(field: CampaignSortField): CampaignSort {
-		const direction =
-			activeSort.field === field
-				? activeSort.direction === 'asc'
-					? 'desc'
-					: 'asc'
-				: defaultSortDirections[field];
-
-		return `${field}-${direction}`;
-	}
-
 	function sortHref(field: CampaignSortField): string {
-		const params = createCampaignQueryParams({ ...query, sort: nextSort(field), page: 1 });
+		const params = createCampaignQueryParams({
+			...query,
+			sort: nextCampaignSort(query.sort, field),
+			page: 1
+		});
 		const path = params ? `/dashboard/items?${params}` : '/dashboard/items';
 
 		return localizeHref(path);
 	}
 
 	function sortLabel(field: CampaignSortField, label: string): string {
-		const direction = nextSort(field).endsWith('-asc') ? 'ascending' : 'descending';
+		const nextSort = nextCampaignSort(query.sort, field);
+		if (nextSort === DEFAULT_CAMPAIGN_SORT && activeSort.field === field) {
+			return m['dashboard.items.sort.default']();
+		}
+		const direction = nextSort.endsWith('-asc') ? 'ascending' : 'descending';
 
 		return m['dashboard.items.sort']({
 			column: label,

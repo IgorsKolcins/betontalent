@@ -3,6 +3,7 @@ import {
 	campaignQuerySchema,
 	createCampaignQueryParams,
 	decodeCampaignQuery,
+	nextCampaignSort,
 	splitCampaignSort
 } from './query';
 
@@ -68,5 +69,11 @@ describe('campaign URL state codec', () => {
 
 		expect(createCampaignQueryParams(query, 1)).toBe('q=summer&channel=social&sort=name-asc');
 		expect(splitCampaignSort(query.sort)).toEqual({ field: 'name', direction: 'asc' });
+	});
+
+	it('cycles a column through both directions and back to the table default', () => {
+		expect(nextCampaignSort('startDate-desc', 'name')).toBe('name-asc');
+		expect(nextCampaignSort('name-asc', 'name')).toBe('name-desc');
+		expect(nextCampaignSort('name-desc', 'name')).toBe('startDate-desc');
 	});
 });

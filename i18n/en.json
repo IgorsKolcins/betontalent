@@ -167,6 +167,7 @@
 	"dashboard.items.sort": "Sort by {column}, {direction}",
 	"dashboard.items.sort.ascending": "ascending",
 	"dashboard.items.sort.descending": "descending",
+	"dashboard.items.sort.default": "Restore the table's default sorting",
 	"dashboard.items.error.forbidden": "You do not have permission to edit campaigns.",
 	"dashboard.items.editStatusLabel": "Edit status for {name}",
 	"dashboard.items.statusSaving": "Saving status for {name}",

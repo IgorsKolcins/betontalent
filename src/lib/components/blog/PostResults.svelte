@@ -22,6 +22,14 @@
 	let isRetrying = $state(false);
 
 	const page = $derived(result.ok ? result.data : undefined);
+	const emptyGridCells = $derived(
+		page && mode === 'blog'
+			? Array.from(
+					{ length: Math.max(0, page.pagination.perPage - page.posts.length) },
+					(_, index) => index
+				)
+			: []
+	);
 
 	async function retry(): Promise<void> {
 		isRetrying = true;
@@ -35,9 +43,21 @@
 
 {#if result.ok && page}
 	{#if page.posts.length > 0}
-		<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+		<div
+			data-post-grid
+			class={mode === 'blog'
+				? 'grid auto-rows-fr gap-5 sm:grid-cols-2 lg:grid-cols-3'
+				: 'grid gap-5 sm:grid-cols-2 lg:grid-cols-3'}
+		>
 			{#each page.posts as post (post.id)}
-				<PostCard {post} />
+				{#if mode === 'blog'}
+					<div data-post-grid-cell class="h-[27rem]"><PostCard {post} /></div>
+				{:else}
+					<PostCard {post} />
+				{/if}
+			{/each}
+			{#each emptyGridCells as index (index)}
+				<div data-post-grid-cell aria-hidden="true" class="h-[27rem]"></div>
 			{/each}
 		</div>
 		<PaginationNav {mode} {query} pagination={page.pagination} />

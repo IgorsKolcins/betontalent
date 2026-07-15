@@ -105,7 +105,7 @@
 			</Button>
 		</nav>
 		<div class="hidden items-center justify-end gap-2 md:flex">
-			<Button href={accountHref} class="h-9">
+			<Button href={accountHref} class="h-9 min-w-28">
 				{accountLabel}
 			</Button>
 			{@render appearanceControls(undefined, false)}

@@ -5,6 +5,7 @@ import type { ApiResult } from '$lib/api/client';
 import type { PostQueryForm } from '$lib/api/posts/query';
 import type { LocalizedPost, PostsResponse } from '$lib/api/posts/schema';
 import PostResults from './PostResults.svelte';
+import '../../../routes/layout.css';
 
 const query: PostQueryForm = {
 	q: 'performance',
@@ -58,10 +59,38 @@ describe('PostResults', () => {
 	});
 
 	it('renders pagination for result sets spanning multiple pages', async () => {
-		render(PostResults, { mode: 'search', query, result: successfulResult([post]) });
+		render(PostResults, {
+			mode: 'search',
+			query,
+			result: successfulResult([post])
+		});
 
 		await expect.element(page.getByRole('button', { name: 'Page 2' })).toBeInTheDocument();
 		await expect.element(page.getByRole('button', { name: 'Next page' })).toBeEnabled();
+	});
+
+	it('keeps the result grid height stable when the last page is not full', () => {
+		const posts = Array.from({ length: 6 }, (_, index) => ({
+			...post,
+			id: `post_${index + 1}`,
+			slug: `fast-content-${index + 1}`
+		}));
+		const fullPage = render(PostResults, {
+			mode: 'blog',
+			query,
+			result: successfulResult(posts)
+		});
+		const lastPage = render(PostResults, {
+			mode: 'blog',
+			query: { ...query, page: 2 },
+			result: successfulResult(posts.slice(0, 2))
+		});
+
+		const fullGrid = fullPage.container.querySelector('[data-post-grid]');
+		const lastGrid = lastPage.container.querySelector('[data-post-grid]');
+		expect(fullGrid).not.toBeNull();
+		expect(lastGrid).not.toBeNull();
+		expect(lastGrid!.getBoundingClientRect().height).toBe(fullGrid!.getBoundingClientRect().height);
 	});
 
 	it('distinguishes an empty search from a service failure', async () => {
