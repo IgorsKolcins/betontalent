@@ -17,6 +17,8 @@ jobs:
     name: Vitest and Playwright
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
 
     steps:
       - name: Check out repository
