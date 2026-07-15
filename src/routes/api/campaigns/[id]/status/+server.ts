@@ -1,4 +1,4 @@
-import { campaignStatusSchema } from '$lib/campaigns/query';
+import { campaignStatusSchema } from '$lib/api/campaigns/query';
 import { canEditItems } from '$lib/server/auth/users';
 import { updateCampaignStatus } from '$lib/server/campaigns';
 import { error, json } from '@sveltejs/kit';

@@ -13,7 +13,7 @@
 		nextCampaignSort,
 		splitCampaignSort,
 		type CampaignSortField
-	} from '$lib/campaigns/query';
+	} from '$lib/api/campaigns/query';
 	import CampaignControls from '$lib/components/dashboard/CampaignControls.svelte';
 	import CampaignPagination from '$lib/components/dashboard/CampaignPagination.svelte';
 	import CampaignStatusEditor from '$lib/components/dashboard/CampaignStatusEditor.svelte';

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { campaignStatusSchema, type CampaignStatus } from '$lib/campaigns/query';
+import { campaignStatusSchema, type CampaignStatus } from '$lib/api/campaigns/query';
 import type { ApiFetch } from '$lib/api/client';
 
 const campaignStatusUpdateSchema = z.object({

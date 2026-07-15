@@ -176,7 +176,6 @@
 	"dashboard.items.statusUpdateInvalid": "The selected status for {name} is invalid. The previous status was restored.",
 	"dashboard.items.statusUpdateNotFound": "{name} no longer exists. Refresh the campaign list.",
 	"dashboard.items.statusUpdateNetwork": "Could not reach the server while updating {name}. The previous status was restored.",
-	"dashboard.items.statusRefreshError": "The status was saved, but the campaign list could not be refreshed.",
 	"dashboard.items.column.name": "Name",
 	"dashboard.items.column.status": "Status",
 	"dashboard.items.column.channel": "Channel",

@@ -176,7 +176,6 @@
 	"dashboard.items.statusUpdateInvalid": "Der ausgewählte Status für {name} ist ungültig. Der vorherige Status wurde wiederhergestellt.",
 	"dashboard.items.statusUpdateNotFound": "{name} ist nicht mehr vorhanden. Aktualisiere die Kampagnenliste.",
 	"dashboard.items.statusUpdateNetwork": "Der Server konnte beim Aktualisieren von {name} nicht erreicht werden. Der vorherige Status wurde wiederhergestellt.",
-	"dashboard.items.statusRefreshError": "Der Status wurde gespeichert, aber die Kampagnenliste konnte nicht aktualisiert werden.",
 	"dashboard.items.column.name": "Name",
 	"dashboard.items.column.status": "Status",
 	"dashboard.items.column.channel": "Kanal",

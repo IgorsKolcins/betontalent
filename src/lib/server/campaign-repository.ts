@@ -1,4 +1,4 @@
-import type { CampaignQuery } from '$lib/campaigns/query';
+import type { CampaignQuery } from '$lib/api/campaigns/query';
 import { getCampaignPage, getCampaignTotalCount, type CampaignPage } from './campaigns';
 
 export type CampaignMetadata = {

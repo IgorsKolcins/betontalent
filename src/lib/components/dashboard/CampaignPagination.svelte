@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { localizeHref } from '$lib/paraglide/runtime.js';
-	import { createCampaignQueryParams, type CampaignQuery } from '$lib/campaigns/query';
+	import { createCampaignQueryParams, type CampaignQuery } from '$lib/api/campaigns/query';
 	import Pagination from '$lib/components/ui/Pagination.svelte';
 
 	let {

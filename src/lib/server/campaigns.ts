@@ -8,7 +8,7 @@ import {
 	splitCampaignSort,
 	type CampaignQuery,
 	type CampaignSortField
-} from '$lib/campaigns/query';
+} from '$lib/api/campaigns/query';
 
 const campaignSchema = z.object({
 	id: z.string(),

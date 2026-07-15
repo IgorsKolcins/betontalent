@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Quote, Star } from '@lucide/svelte';
-	import type { HomepageContent } from '$lib/homepage/schema';
+	import type { HomepageContent } from '$lib/api/homepage/schema';
 	import Container from '$lib/components/ui/Container.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import { getLocale } from '$lib/paraglide/runtime.js';

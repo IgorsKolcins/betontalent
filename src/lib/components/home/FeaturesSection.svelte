@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { BarChart3, SearchCheck, SlidersHorizontal, Workflow } from '@lucide/svelte';
-	import type { HomepageContent } from '$lib/homepage/schema';
+	import type { HomepageContent } from '$lib/api/homepage/schema';
 	import Container from '$lib/components/ui/Container.svelte';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/Card';
 	import { m } from '$lib/paraglide/messages.js';
