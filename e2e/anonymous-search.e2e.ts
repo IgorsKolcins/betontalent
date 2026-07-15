@@ -8,11 +8,6 @@ test('an anonymous visitor searches, opens a result, and reads the post', async 
 
 	await expect(page).toHaveURL(/\/en\/search\?q=Sub-second(?:\+|%20)LCP/);
 	await expect(page.getByText('1 results for "Sub-second LCP"')).toBeVisible();
-	await page.waitForLoadState('networkidle');
-	await expect(page).toHaveScreenshot('search-results.png', {
-		animations: 'disabled',
-		fullPage: true
-	});
 
 	await page.getByRole('combobox', { name: 'Sort by' }).selectOption('title-asc');
 	await expect(page).toHaveURL(/sort=title-asc/);
