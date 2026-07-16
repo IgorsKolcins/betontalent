@@ -17,7 +17,7 @@ test('an authenticated editor sees an accessible dashboard and campaign edits st
 	await page.goto('/en');
 	const dashboardLink = page.getByRole('link', { name: 'Dashboard', exact: true });
 	await expect(dashboardLink).toBeVisible();
-	await expect(page.getByRole('link', { name: 'Sign in', exact: true })).toHaveCount(0);
+	await expect(page.getByRole('link', { name: 'Sign in', exact: true })).toBeHidden();
 	await dashboardLink.click();
 	await expect(page).toHaveURL(/\/en\/dashboard$/);
 
