@@ -11,7 +11,6 @@
 		Search,
 		Sun
 	} from '@lucide/svelte';
-	import { onMount } from 'svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Container from '$lib/components/ui/Container.svelte';
 	import Drawer from '$lib/components/ui/Drawer.svelte';
@@ -21,40 +20,16 @@
 	import { cn } from '$lib/utils/cn';
 
 	const theme = getThemeContext();
-	let isAuthenticated = $state(false);
 	const pricingHref = `${resolve(localizeHref('/') as '/')}#pricing`;
+	const loginHref = resolve(localizeHref('/login') as '/login');
+	const dashboardHref = resolve(localizeHref('/dashboard') as '/dashboard');
 	const activeLocale = $derived(getLocale());
 	const nextLocale = $derived((activeLocale === 'en' ? 'de' : 'en') satisfies Locale);
-	const accountHref = $derived(
-		isAuthenticated
-			? resolve(localizeHref('/dashboard') as '/dashboard')
-			: resolve(localizeHref('/login') as '/login')
-	);
-	const accountLabel = $derived(isAuthenticated ? m['nav.dashboard']() : m['nav.login']());
 	const localeHref = $derived.by(() => {
 		const routePath = deLocalizeHref(page.url.pathname);
 		const currentUrl = routePath === '/' ? routePath : `${routePath}${page.url.search}`;
 
 		return resolve(localizeHref(currentUrl, { locale: nextLocale }) as '/');
-	});
-
-	onMount(() => {
-		const controller = new AbortController();
-
-		void fetch(resolve('/api/auth/session'), { signal: controller.signal })
-			.then(async (response) => {
-				if (!response.ok) return;
-
-				const result = (await response.json()) as { isAuthenticated?: unknown };
-				if (typeof result.isAuthenticated === 'boolean') {
-					isAuthenticated = result.isAuthenticated;
-				}
-			})
-			.catch(() => {
-				// The anonymous CTA is the safe progressive-enhancement fallback.
-			});
-
-		return () => controller.abort();
 	});
 </script>
 
@@ -105,8 +80,19 @@
 			</Button>
 		</nav>
 		<div class="hidden items-center justify-end gap-2 md:flex">
-			<Button href={accountHref} class="h-9 min-w-28">
-				{accountLabel}
+			<Button
+				href={loginHref}
+				data-auth-action="anonymous"
+				class="h-9 min-w-28 [[data-auth-state=authenticated]_&]:hidden!"
+			>
+				{m['nav.login']()}
+			</Button>
+			<Button
+				href={dashboardHref}
+				data-auth-action="authenticated"
+				class="hidden! h-9 min-w-28 [[data-auth-state=authenticated]_&]:inline-flex!"
+			>
+				{m['nav.dashboard']()}
 			</Button>
 			{@render appearanceControls(undefined, false)}
 		</div>
@@ -165,17 +151,24 @@
 							{m['nav.search']()}
 						</Button>
 						<Button
-							href={accountHref}
+							href={loginHref}
+							data-auth-action="anonymous"
 							variant="ghost"
 							onclick={close}
-							class="h-10 w-full justify-start gap-3"
+							class="h-10 w-full justify-start gap-3 [[data-auth-state=authenticated]_&]:hidden!"
 						>
-							{#if isAuthenticated}
-								<LayoutDashboard aria-hidden="true" class="size-4" />
-							{:else}
-								<LogIn aria-hidden="true" class="size-4" />
-							{/if}
-							{accountLabel}
+							<LogIn aria-hidden="true" class="size-4" />
+							{m['nav.login']()}
+						</Button>
+						<Button
+							href={dashboardHref}
+							data-auth-action="authenticated"
+							variant="ghost"
+							onclick={close}
+							class="hidden! h-10 w-full justify-start gap-3 [[data-auth-state=authenticated]_&]:inline-flex!"
+						>
+							<LayoutDashboard aria-hidden="true" class="size-4" />
+							{m['nav.dashboard']()}
 						</Button>
 					</nav>
 

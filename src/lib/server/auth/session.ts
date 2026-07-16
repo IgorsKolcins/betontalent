@@ -4,6 +4,7 @@ import type { Cookies } from '@sveltejs/kit';
 import { z } from 'zod';
 
 export const SESSION_COOKIE_NAME = 'session';
+export const AUTH_HINT_COOKIE_NAME = 'auth_hint';
 
 // Active sessions slide by one hour once half their idle window remains. The original
 // issue time never changes, enforcing a hard 24-hour lifetime despite renewals.
@@ -86,15 +87,26 @@ async function decodeSession(value: string): Promise<SessionClaims | null> {
 }
 
 function setCookie(cookies: Cookies, value: string, expiresAt: number, now: number) {
-	// HttpOnly blocks client-side credential access; Lax retains normal navigation while
-	// limiting cross-site submission. Secure is disabled only for local HTTP development.
-	cookies.set(SESSION_COOKIE_NAME, value, {
-		httpOnly: true,
-		sameSite: 'lax',
+	const sharedOptions = {
+		sameSite: 'lax' as const,
 		secure: !dev,
 		path: '/',
 		expires: new Date(expiresAt),
 		maxAge: Math.max(0, Math.floor((expiresAt - now) / 1000))
+	};
+
+	// This readable cookie is only a display hint for prerendered navigation. It never
+	// grants access; protected routes continue to verify the signed HttpOnly session.
+	cookies.set(AUTH_HINT_COOKIE_NAME, '1', {
+		...sharedOptions,
+		httpOnly: false
+	});
+
+	// HttpOnly blocks client-side credential access; Lax retains normal navigation while
+	// limiting cross-site submission. Secure is disabled only for local HTTP development.
+	cookies.set(SESSION_COOKIE_NAME, value, {
+		...sharedOptions,
+		httpOnly: true
 	});
 }
 
@@ -148,6 +160,12 @@ export async function resolveSession(
 }
 
 export function clearSession(cookies: Cookies) {
+	cookies.delete(AUTH_HINT_COOKIE_NAME, {
+		httpOnly: false,
+		sameSite: 'lax',
+		secure: !dev,
+		path: '/'
+	});
 	cookies.delete(SESSION_COOKIE_NAME, {
 		httpOnly: true,
 		sameSite: 'lax',

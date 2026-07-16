@@ -1,11 +1,17 @@
 <script lang="ts">
-	import { onNavigate } from '$app/navigation';
+	import { afterNavigate, onNavigate } from '$app/navigation';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { getBlogTransition } from '$lib/view-transitions/blog';
 
 	let { children } = $props();
 	let activeBlogTransition = 0;
+
+	afterNavigate(() => {
+		document.documentElement.dataset.authState = document.cookie.split('; ').includes('auth_hint=1')
+			? 'authenticated'
+			: 'anonymous';
+	});
 
 	onNavigate((navigation) => {
 		const blogTransition = getBlogTransition(

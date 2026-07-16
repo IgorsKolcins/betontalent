@@ -1,15 +1,16 @@
 <!doctype html>
-<html lang="%lang%" dir="%dir%">
+<html lang="%lang%" dir="%dir%" data-auth-state="anonymous">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
 		<script>
-			const theme = document.cookie
-				.split('; ')
-				.find((entry) => entry.startsWith('theme='))
-				?.split('=')[1];
+			const cookies = document.cookie.split('; ');
+			const theme = cookies.find((entry) => entry.startsWith('theme='))?.split('=')[1];
 			document.documentElement.classList.toggle('dark', theme === 'dark');
+			document.documentElement.dataset.authState = cookies.includes('auth_hint=1')
+				? 'authenticated'
+				: 'anonymous';
 		</script>
 		%sveltekit.head%
 	</head>

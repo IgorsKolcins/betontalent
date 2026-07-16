@@ -1,7 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { Cookies } from '@sveltejs/kit';
 import type { CookieSerializeOptions } from 'cookie';
-import { SESSION_COOKIE_NAME, clearSession, createSession, resolveSession } from './session';
+import {
+	AUTH_HINT_COOKIE_NAME,
+	SESSION_COOKIE_NAME,
+	clearSession,
+	createSession,
+	resolveSession
+} from './session';
 
 const originalSecret = process.env.SESSION_SECRET;
 
@@ -26,6 +32,10 @@ describe('session', () => {
 			renewed: false
 		});
 		expect(jar.get(SESSION_COOKIE_NAME)).toMatch(/^[\w-]+\.[\w-]+$/);
+		expect(jar.get(AUTH_HINT_COOKIE_NAME)).toBe('1');
+		expect(jar.setOptions.get(AUTH_HINT_COOKIE_NAME)).toEqual(
+			expect.objectContaining({ httpOnly: false, sameSite: 'lax', path: '/' })
+		);
 		expect(jar.lastSetOptions).toEqual(
 			expect.objectContaining({ httpOnly: true, sameSite: 'lax', path: '/' })
 		);
@@ -52,6 +62,7 @@ describe('session', () => {
 
 		await expect(resolveSession(jar, 1_000_001)).resolves.toEqual({ status: 'invalid' });
 		expect(jar.get(SESSION_COOKIE_NAME)).toBeUndefined();
+		expect(jar.get(AUTH_HINT_COOKIE_NAME)).toBeUndefined();
 	});
 
 	it('expires and removes a session after its idle lifetime', async () => {
@@ -63,6 +74,7 @@ describe('session', () => {
 			status: 'expired'
 		});
 		expect(jar.get(SESSION_COOKIE_NAME)).toBeUndefined();
+		expect(jar.get(AUTH_HINT_COOKIE_NAME)).toBeUndefined();
 	});
 
 	it('enforces the absolute lifetime despite repeated idle renewals', async () => {
@@ -88,11 +100,13 @@ describe('session', () => {
 		clearSession(jar);
 
 		expect(jar.get(SESSION_COOKIE_NAME)).toBeUndefined();
+		expect(jar.get(AUTH_HINT_COOKIE_NAME)).toBeUndefined();
 	});
 });
 
 class MemoryCookieJar implements Cookies {
 	readonly values = new Map<string, string>();
+	readonly setOptions = new Map<string, CookieSerializeOptions & { path: string }>();
 	lastSetOptions?: CookieSerializeOptions & { path: string };
 
 	get(name: string): string | undefined {
@@ -105,6 +119,7 @@ class MemoryCookieJar implements Cookies {
 
 	set(name: string, value: string, options: CookieSerializeOptions & { path: string }): void {
 		this.values.set(name, value);
+		this.setOptions.set(name, options);
 		this.lastSetOptions = options;
 	}
 

@@ -89,8 +89,8 @@ p.s. Attached .html with task description feels too vibe-coded.
 ### Decisions and trade-offs
 
 - I kept URL state and server data loading as the source of truth. Public content is static or SSR, dashboard data is streamed, and mock JSON is validated once at the server boundary.
-- The campaign store is intentionally in memory, so edits reset when the server restarts. The static public header also avoids session personalization to keep the homepage cacheable.
-- I chose GitHub Actions for pull-request quality gates and Vercel for deployment. The CI jobs run independently in one workflow to keep feedback fast and configuration easy to follow, while Vercel's SvelteKit adapter provides the required per-route Edge and Node runtime split plus Git-based preview and production deployments. Lighthouse and bundle-budget gates remain manual.
+- The campaign store is intentionally in memory, so edits reset when the server restarts.
+- To keep the homepage prerendered without flashing the wrong "Sign-in" button in header, the static header uses a non-authoritative `auth_hint` cookie before hydration. The signed HttpOnly session and server guards remain the only source of authorization.
 
 ### Challenges encountered
 
