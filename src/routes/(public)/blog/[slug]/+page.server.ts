@@ -4,11 +4,15 @@ import { getLocaleSeo } from '$lib/seo';
 import { getPost } from '$lib/server/posts';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = ({ params, url }) => {
+export const load: PageServerLoad = ({ params, setHeaders, url }) => {
 	const locale = getLocale();
 	const post = getPost(params.slug, locale);
 
 	if (!post) error(404, 'Post not found');
+
+	setHeaders({
+		'Cache-Control': 'public, max-age=120, s-maxage=86400'
+	});
 
 	return {
 		post,
